@@ -2,34 +2,31 @@ import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  throw new Error('Please add MONGODB_URI to .env.local');
+  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
 let client;
 let clientPromise;
 
 if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri);
     global._mongoClientPromise = client.connect();
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  // In production mode, it's best to not use a global variable.
   client = new MongoClient(uri);
   clientPromise = client.connect();
 }
 
-export async function getDB() {
-  const connection = await clientPromise;
-  return connection.db();
+async function getDb() {
+  const conn = await clientPromise;
+  return conn.db();
 }
 
 export async function saveCV(id, cvData) {
-  const db = await getDB();
-  const collection = db.collection('cvs');
+  const db = await getDb();
+  const collection = db.collection('cv_data');
 
   const document = {
     _id: id,
@@ -44,10 +41,6 @@ export async function saveCV(id, cvData) {
     linkedinUrl: cvData.linkedinUrl || '',
     githubUrl: cvData.githubUrl || '',
     websiteUrl: cvData.websiteUrl || '',
-    dob: cvData.dob || '',
-    gender: cvData.gender || 'Male',
-    civilStatus: cvData.civilStatus || 'Single',
-    nationality: cvData.nationality || 'Sri Lankan',
     summary: cvData.summary || '',
     profilePhoto: cvData.profilePhoto || '',
     education: cvData.education || [],
@@ -57,21 +50,21 @@ export async function saveCV(id, cvData) {
     updatedAt: new Date()
   };
 
-  // Upsert CV details
   await collection.updateOne(
     { _id: id },
-    { 
+    {
       $set: document,
       $setOnInsert: { createdAt: new Date() }
     },
     { upsert: true }
   );
+
   return id;
 }
 
 export async function getCV(id) {
-  const db = await getDB();
-  const collection = db.collection('cvs');
+  const db = await getDb();
+  const collection = db.collection('cv_data');
   const doc = await collection.findOne({ _id: id });
   if (!doc) return null;
 
@@ -88,100 +81,92 @@ export async function getCV(id) {
     linkedinUrl: doc.linkedinUrl,
     githubUrl: doc.githubUrl,
     websiteUrl: doc.websiteUrl,
-    dob: doc.dob,
-    gender: doc.gender,
-    civilStatus: doc.civilStatus,
-    nationality: doc.nationality,
     summary: doc.summary,
     profilePhoto: doc.profilePhoto,
-    education: doc.education,
-    experience: doc.experience,
-    skills: doc.skills,
-    references: doc.references,
+    education: doc.education || [],
+    experience: doc.experience || [],
+    skills: doc.skills || [],
+    references: doc.references || [],
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt
   };
 }
 
 export async function createTransaction(txId, cvId, bankName, paymentSlip, whatsappNumber) {
-  const db = await getDB();
+  const db = await getDb();
   const collection = db.collection('transactions');
-
-  const doc = {
+  await collection.insertOne({
     _id: txId,
-    cv_id: cvId,
-    bank_name: bankName,
-    payment_slip: paymentSlip,
-    whatsapp_number: whatsappNumber,
+    cvId: cvId,
+    bankName: bankName,
+    paymentSlip: paymentSlip,
+    whatsappNumber: whatsappNumber || '',
     status: 'pending',
     createdAt: new Date()
-  };
-
-  await collection.insertOne(doc);
+  });
   return txId;
 }
 
 export async function getTransactions() {
-  const db = await getDB();
+  const db = await getDb();
   const collection = db.collection('transactions');
 
-  const pipeline = [
+  const list = await collection.aggregate([
     {
       $lookup: {
-        from: 'cvs',
-        localField: 'cv_id',
+        from: 'cv_data',
+        localField: 'cvId',
         foreignField: '_id',
         as: 'cv'
       }
     },
     {
-      $unwind: '$cv'
-    },
-    {
-      $project: {
-        id: '$_id',
-        cv_id: 1,
-        bank_name: 1,
-        payment_slip: 1,
-        whatsapp_number: 1,
-        status: 1,
-        created_at: '$createdAt',
-        full_name: '$cv.fullName',
-        email: '$cv.email',
-        language: '$cv.language'
+      $unwind: {
+        path: '$cv',
+        preserveNullAndEmptyArrays: true
       }
     },
     {
-      $sort: { created_at: -1 }
+      $sort: { createdAt: -1 }
     }
-  ];
+  ]).toArray();
 
-  return await collection.aggregate(pipeline).toArray();
+  return list.map(tx => ({
+    id: tx._id,
+    cv_id: tx.cvId,
+    bank_name: tx.bankName,
+    payment_slip: tx.paymentSlip,
+    whatsapp_number: tx.whatsappNumber,
+    status: tx.status,
+    created_at: tx.createdAt,
+    full_name: tx.cv?.fullName || '',
+    email: tx.cv?.email || '',
+    language: tx.cv?.language || 'en'
+  }));
 }
 
 export async function getTransaction(id) {
-  const db = await getDB();
+  const db = await getDb();
   const collection = db.collection('transactions');
-  const doc = await collection.findOne({ _id: id });
-  if (!doc) return null;
-  
+  const tx = await collection.findOne({ _id: id });
+  if (!tx) return null;
   return {
-    id: doc._id,
-    cv_id: doc.cv_id,
-    bank_name: doc.bank_name,
-    payment_slip: doc.payment_slip,
-    whatsapp_number: doc.whatsapp_number,
-    status: doc.status,
-    createdAt: doc.createdAt
+    id: tx._id,
+    cv_id: tx.cvId,
+    bank_name: tx.bankName,
+    payment_slip: tx.paymentSlip,
+    whatsapp_number: tx.whatsappNumber,
+    status: tx.status,
+    created_at: tx.createdAt
   };
 }
 
 export async function updateTransactionStatus(id, status) {
-  const db = await getDB();
+  const db = await getDb();
   const collection = db.collection('transactions');
   await collection.updateOne(
     { _id: id },
-    { $set: { status, updatedAt: new Date() } }
+    { $set: { status: status } }
   );
   return true;
 }
