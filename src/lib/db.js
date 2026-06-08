@@ -1,32 +1,44 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
 let client;
-let clientPromise;
+let clientPromise = null;
 
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri);
-    global._mongoClientPromise = client.connect();
+function getClientPromise() {
+  if (clientPromise) return clientPromise;
+
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    // Return null during build compilation if the environment variable isn't set yet.
+    // It will log a warning but won't crash the Next.js compiler.
+    console.warn('⚠️ WARNING: MONGODB_URI environment variable is missing.');
+    return null;
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri);
-  clientPromise = client.connect();
+
+  if (process.env.NODE_ENV === 'development') {
+    if (!global._mongoClientPromise) {
+      client = new MongoClient(uri);
+      global._mongoClientPromise = client.connect();
+    }
+    clientPromise = global._mongoClientPromise;
+  } else {
+    client = new MongoClient(uri);
+    clientPromise = client.connect();
+  }
+  return clientPromise;
 }
 
-async function getDb() {
-  const conn = await clientPromise;
-  return conn.db();
+export async function getDB() {
+  const promise = getClientPromise();
+  if (!promise) {
+    throw new Error('Database connection failed: MONGODB_URI environment variable is missing. Please add MONGODB_URI to your environment variables.');
+  }
+  const connection = await promise;
+  return connection.db();
 }
 
 export async function saveCV(id, cvData) {
-  const db = await getDb();
-  const collection = db.collection('cv_data');
+  const db = await getDB();
+  const collection = db.collection('cvs');
 
   const document = {
     _id: id,
@@ -41,6 +53,10 @@ export async function saveCV(id, cvData) {
     linkedinUrl: cvData.linkedinUrl || '',
     githubUrl: cvData.githubUrl || '',
     websiteUrl: cvData.websiteUrl || '',
+    dob: cvData.dob || '',
+    gender: cvData.gender || 'Male',
+    civilStatus: cvData.civilStatus || 'Single',
+    nationality: cvData.nationality || 'Sri Lankan',
     summary: cvData.summary || '',
     profilePhoto: cvData.profilePhoto || '',
     education: cvData.education || [],
@@ -50,21 +66,21 @@ export async function saveCV(id, cvData) {
     updatedAt: new Date()
   };
 
+  // Upsert CV details
   await collection.updateOne(
     { _id: id },
-    {
+    { 
       $set: document,
       $setOnInsert: { createdAt: new Date() }
     },
     { upsert: true }
   );
-
   return id;
 }
 
 export async function getCV(id) {
-  const db = await getDb();
-  const collection = db.collection('cv_data');
+  const db = await getDB();
+  const collection = db.collection('cvs');
   const doc = await collection.findOne({ _id: id });
   if (!doc) return null;
 
@@ -81,92 +97,100 @@ export async function getCV(id) {
     linkedinUrl: doc.linkedinUrl,
     githubUrl: doc.githubUrl,
     websiteUrl: doc.websiteUrl,
+    dob: doc.dob,
+    gender: doc.gender,
+    civilStatus: doc.civilStatus,
+    nationality: doc.nationality,
     summary: doc.summary,
     profilePhoto: doc.profilePhoto,
-    education: doc.education || [],
-    experience: doc.experience || [],
-    skills: doc.skills || [],
-    references: doc.references || [],
+    education: doc.education,
+    experience: doc.experience,
+    skills: doc.skills,
+    references: doc.references,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt
   };
 }
 
 export async function createTransaction(txId, cvId, bankName, paymentSlip, whatsappNumber) {
-  const db = await getDb();
+  const db = await getDB();
   const collection = db.collection('transactions');
-  await collection.insertOne({
+
+  const doc = {
     _id: txId,
-    cvId: cvId,
-    bankName: bankName,
-    paymentSlip: paymentSlip,
-    whatsappNumber: whatsappNumber || '',
+    cv_id: cvId,
+    bank_name: bankName,
+    payment_slip: paymentSlip,
+    whatsapp_number: whatsappNumber,
     status: 'pending',
     createdAt: new Date()
-  });
+  };
+
+  await collection.insertOne(doc);
   return txId;
 }
 
 export async function getTransactions() {
-  const db = await getDb();
+  const db = await getDB();
   const collection = db.collection('transactions');
 
-  const list = await collection.aggregate([
+  const pipeline = [
     {
       $lookup: {
-        from: 'cv_data',
-        localField: 'cvId',
+        from: 'cvs',
+        localField: 'cv_id',
         foreignField: '_id',
         as: 'cv'
       }
     },
     {
-      $unwind: {
-        path: '$cv',
-        preserveNullAndEmptyArrays: true
+      $unwind: '$cv'
+    },
+    {
+      $project: {
+        id: '$_id',
+        cv_id: 1,
+        bank_name: 1,
+        payment_slip: 1,
+        whatsapp_number: 1,
+        status: 1,
+        created_at: '$createdAt',
+        full_name: '$cv.fullName',
+        email: '$cv.email',
+        language: '$cv.language'
       }
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { created_at: -1 }
     }
-  ]).toArray();
+  ];
 
-  return list.map(tx => ({
-    id: tx._id,
-    cv_id: tx.cvId,
-    bank_name: tx.bankName,
-    payment_slip: tx.paymentSlip,
-    whatsapp_number: tx.whatsappNumber,
-    status: tx.status,
-    created_at: tx.createdAt,
-    full_name: tx.cv?.fullName || '',
-    email: tx.cv?.email || '',
-    language: tx.cv?.language || 'en'
-  }));
+  return await collection.aggregate(pipeline).toArray();
 }
 
 export async function getTransaction(id) {
-  const db = await getDb();
+  const db = await getDB();
   const collection = db.collection('transactions');
-  const tx = await collection.findOne({ _id: id });
-  if (!tx) return null;
+  const doc = await collection.findOne({ _id: id });
+  if (!doc) return null;
+  
   return {
-    id: tx._id,
-    cv_id: tx.cvId,
-    bank_name: tx.bankName,
-    payment_slip: tx.paymentSlip,
-    whatsapp_number: tx.whatsappNumber,
-    status: tx.status,
-    created_at: tx.createdAt
+    id: doc._id,
+    cv_id: doc.cv_id,
+    bank_name: doc.bank_name,
+    payment_slip: doc.payment_slip,
+    whatsapp_number: doc.whatsapp_number,
+    status: doc.status,
+    createdAt: doc.createdAt
   };
 }
 
 export async function updateTransactionStatus(id, status) {
-  const db = await getDb();
+  const db = await getDB();
   const collection = db.collection('transactions');
   await collection.updateOne(
     { _id: id },
-    { $set: { status: status } }
+    { $set: { status, updatedAt: new Date() } }
   );
   return true;
 }
