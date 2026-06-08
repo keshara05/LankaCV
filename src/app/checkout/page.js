@@ -182,7 +182,7 @@ function CheckoutForm() {
                 </div>
                 <div className="grid grid-cols-3 items-center">
                   <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 col-span-1">{t.accNo}</span>
-                  <span className="text-indigo-600 dark:text-indigo-400 col-span-2 font-bold font-mono tracking-wider text-[13px]">87654321</span>
+                  <span className="text-indigo-600 dark:text-indigo-400 col-span-2 font-bold font-mono tracking-wider text-[13px]">94360792</span>
                 </div>
                 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-850 space-y-1">
