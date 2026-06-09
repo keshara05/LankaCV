@@ -4,6 +4,353 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TRANSLATIONS } from '@/lib/translations';
 
+// Interactive, CSS-animated CV Mockup Component
+function CvMockup({ lang }) {
+  const [hoveredSection, setHoveredSection] = useState(null);
+
+  const t = {
+    en: {
+      name: "Keshara Ranasinghe",
+      title: "Senior Software Engineer",
+      email: "keshara@example.com",
+      phone: "+94 77 123 4567",
+      nic: "199512345678 (Verified NIC)",
+      education: "Education (G.C.E. O/L & A/L)",
+      ol: "G.C.E. O/L - Royal College",
+      al: "G.C.E. A/L - Royal College",
+      maths: "Combined Mathematics",
+      physics: "Physics",
+      chemistry: "Chemistry",
+      english: "English",
+      science: "Science",
+      history: "History",
+      experience: "Work Experience",
+      exp1: "Tech Lead @ Sysco LABS",
+      exp1Desc: "Led team of 5 engineers to build high-scale cloud apps.",
+      skills: "Skills",
+      skillsList: ["React", "Next.js", "Node.js", "SQL"],
+      ref: "References",
+      signature: "Applicant's Signature",
+      sigLine: "......................................",
+      dateLine: "Date: 2026/06/09",
+      tooltipHeader: "Professional Details & Profile Picture support",
+      tooltipEdu: "Dedicated tables for O/L & A/L results in Sri Lankan format!",
+      tooltipExp: "Chronological work history with clear bullet points.",
+      tooltipNic: "Civil status, NIC, and local requirements included.",
+      tooltipSig: "Signature blocks and date lines for formal applications."
+    },
+    si: {
+      name: "කේෂර රණසිංහ",
+      title: "ජ්‍යෙෂ්ඨ මෘදුකාංග ඉංජිනේරු",
+      email: "keshara@example.com",
+      phone: "+94 77 123 4567",
+      nic: "199512345678 (තහවුරු කළ NIC)",
+      education: "අධ්‍යාපන සුදුසුකම් (G.C.E. O/L & A/L)",
+      ol: "G.C.E. O/L - කොළඹ රාජකීය විද්‍යාලය",
+      al: "G.C.E. A/L - කොළඹ රාජකීය විද්‍යාලය",
+      maths: "සංයුක්ත ගණිතය",
+      physics: "භෞතික විද්‍යාව",
+      chemistry: "රසායන විද්‍යාව",
+      english: "ඉංග්‍රීසි",
+      science: "විද්‍යාව",
+      history: "ඉතිහාසය",
+      experience: "රැකියා පළපුරුද්ද",
+      exp1: "Tech Lead @ Sysco LABS",
+      exp1Desc: "මෘදුකාංග ඉංජිනේරුවන් 5 දෙනෙකුගෙන් යුත් කණ්ඩායමක් මෙහෙයවීම.",
+      skills: "දක්ෂතා (Skills)",
+      skillsList: ["React", "Next.js", "Node.js", "SQL"],
+      ref: "නිර්දේශ කරන්නන්",
+      signature: "අයදුම්කරුගේ අත්සන",
+      sigLine: "......................................",
+      dateLine: "දිනය: 2026/06/09",
+      tooltipHeader: "වෘත්තීය විස්තර සහ පැහැදිලි ඡායාරූප ඇතුළත් කිරීමේ හැකියාව",
+      tooltipEdu: "O/L සහ A/L ප්‍රතිඵල වගු ලංකාවේ ක්‍රමයටම ඇතුළත් කළ හැක!",
+      tooltipExp: "රැකියා පළපුරුද්ද පිළිවෙළට සහ පැහැදිලිව සැකසීමේ හැකියාව.",
+      tooltipNic: "සිවිල් තත්ත්වය, NIC සහ ලංකාවේ රැකියාවලට අත්‍යවශ්‍ය විස්තර.",
+      tooltipSig: "අත්සන තැබීමට විශේෂ ඉඩක් සහ දින සටහන් ඇතුළත් වේ."
+    }
+  }[lang];
+
+  return (
+    <div className="relative group/mockup animate-float max-w-md mx-auto w-full">
+      {/* Background glow shadow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-500/20 to-emerald-500/25 rounded-3xl blur-2xl opacity-70 group-hover/mockup:opacity-100 transition duration-1000"></div>
+
+      {/* CV Sheet Container */}
+      <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-2xl p-5 md:p-6 text-left text-[9px] md:text-[10px] text-slate-700 dark:text-slate-350 transition-colors duration-300">
+        
+        {/* CV Header */}
+        <div 
+          onMouseEnter={() => setHoveredSection('header')}
+          onMouseLeave={() => setHoveredSection(null)}
+          className={`flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'header' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+        >
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-white text-sm md:text-base font-black shadow-inner">
+            KR
+          </div>
+          <div className="flex-1 space-y-0.5">
+            <h4 className="text-[11px] md:text-[12px] font-black text-slate-900 dark:text-white leading-none uppercase tracking-tight">{t.name}</h4>
+            <p className="text-[8px] md:text-[9px] text-indigo-600 dark:text-indigo-400 font-extrabold leading-none">{t.title}</p>
+            <div className="flex flex-wrap gap-x-2 text-[7px] text-slate-400">
+              <span>✉ {t.email}</span>
+              <span>📞 {t.phone}</span>
+            </div>
+          </div>
+
+          {hoveredSection === 'header' && (
+            <div className="absolute -top-10 right-0 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold px-2 py-1 rounded-lg shadow-xl text-[8px] md:text-[9px] z-30 animate-fade-in whitespace-nowrap border border-slate-850 dark:border-slate-100">
+              💡 {t.tooltipHeader}
+            </div>
+          )}
+        </div>
+
+        {/* NIC & Personal Info */}
+        <div 
+          onMouseEnter={() => setHoveredSection('nic')}
+          onMouseLeave={() => setHoveredSection(null)}
+          className={`mt-3 grid grid-cols-2 gap-2 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'nic' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+        >
+          <div>
+            <span className="text-slate-400 dark:text-slate-500 block font-bold uppercase text-[6px]">NIC Number</span>
+            <span className="font-extrabold text-slate-800 dark:text-slate-200">{t.nic}</span>
+          </div>
+          <div>
+            <span className="text-slate-400 dark:text-slate-500 block font-bold uppercase text-[6px]">Status / Nationality</span>
+            <span className="font-extrabold text-slate-800 dark:text-slate-200">Single / Sri Lankan</span>
+          </div>
+
+          {hoveredSection === 'nic' && (
+            <div className="absolute -top-10 right-0 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold px-2 py-1 rounded-lg shadow-xl text-[8px] md:text-[9px] z-30 animate-fade-in whitespace-nowrap border border-slate-850 dark:border-slate-100">
+              💡 {t.tooltipNic}
+            </div>
+          )}
+        </div>
+
+        {/* Education (Sri Lankan Table formats) */}
+        <div 
+          onMouseEnter={() => setHoveredSection('education')}
+          onMouseLeave={() => setHoveredSection(null)}
+          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'education' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+        >
+          <h5 className="font-black text-slate-900 dark:text-white border-b border-indigo-500/20 pb-0.5 mb-1 uppercase tracking-wider text-[7px] md:text-[8px]">{t.education}</h5>
+          
+          <div className="space-y-1.5">
+            <div>
+              <p className="font-bold text-slate-800 dark:text-slate-200 text-[8px] leading-tight">{t.al} <span className="text-slate-400 font-normal">(2014)</span></p>
+              {/* Table */}
+              <table className="w-full mt-1 border-collapse border border-slate-200 dark:border-slate-800">
+                <thead>
+                  <tr className="bg-slate-50 dark:bg-slate-950 text-[6px] text-slate-400 font-bold uppercase text-left">
+                    <th className="border border-slate-200 dark:border-slate-800 p-0.5 px-1.5">Subject</th>
+                    <th className="border border-slate-200 dark:border-slate-800 p-0.5 text-center w-10">Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="text-slate-600 dark:text-slate-400">
+                    <td className="border border-slate-200 dark:border-slate-800 p-0.5 px-1.5">{t.maths}</td>
+                    <td className="border border-slate-200 dark:border-slate-800 p-0.5 text-center font-black text-indigo-600 dark:text-indigo-400">A</td>
+                  </tr>
+                  <tr className="text-slate-600 dark:text-slate-400">
+                    <td className="border border-slate-200 dark:border-slate-800 p-0.5 px-1.5">{t.physics}</td>
+                    <td className="border border-slate-200 dark:border-slate-800 p-0.5 text-center font-black text-indigo-600 dark:text-indigo-400">A</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <p className="font-bold text-slate-800 dark:text-slate-200 text-[8px] leading-tight">{t.ol} <span className="text-slate-400 font-normal">(2011)</span></p>
+              <div className="flex gap-1.5 mt-0.5">
+                <span className="px-1 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold border border-indigo-150 dark:border-indigo-900/40 rounded text-[7px]">Maths: A</span>
+                <span className="px-1 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold border border-indigo-150 dark:border-indigo-900/40 rounded text-[7px]">Science: A</span>
+                <span className="px-1 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold border border-indigo-150 dark:border-indigo-900/40 rounded text-[7px]">English: A</span>
+              </div>
+            </div>
+          </div>
+
+          {hoveredSection === 'education' && (
+            <div className="absolute top-[20%] right-0 bg-emerald-600 text-white font-extrabold px-2 py-1 rounded-lg shadow-xl text-[8px] md:text-[9px] z-30 animate-fade-in whitespace-nowrap">
+              💡 {t.tooltipEdu}
+            </div>
+          )}
+        </div>
+
+        {/* Experience */}
+        <div 
+          onMouseEnter={() => setHoveredSection('experience')}
+          onMouseLeave={() => setHoveredSection(null)}
+          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'experience' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+        >
+          <h5 className="font-black text-slate-900 dark:text-white border-b border-indigo-500/20 pb-0.5 mb-1 uppercase tracking-wider text-[7px] md:text-[8px]">{t.experience}</h5>
+          
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-slate-850 dark:text-slate-200">{t.exp1}</span>
+              <span className="text-[6.5px] text-slate-400">2021 - Present</span>
+            </div>
+            <p className="text-[7.5px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{t.exp1Desc}</p>
+          </div>
+
+          {hoveredSection === 'experience' && (
+            <div className="absolute bottom-[20%] right-0 bg-indigo-600 text-white font-extrabold px-2 py-1 rounded-lg shadow-xl text-[8px] md:text-[9px] z-30 animate-fade-in whitespace-nowrap">
+              💡 {t.tooltipExp}
+            </div>
+          )}
+        </div>
+
+        {/* Signature Box */}
+        <div 
+          onMouseEnter={() => setHoveredSection('signature')}
+          onMouseLeave={() => setHoveredSection(null)}
+          className={`mt-3 pt-2.5 border-t border-dashed border-slate-250 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 flex justify-between items-end ${hoveredSection === 'signature' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+        >
+          <div className="space-y-0.5">
+            <span className="text-slate-450 dark:text-slate-500 block text-[6px] uppercase font-bold">{t.signature}</span>
+            <span className="text-slate-300 dark:text-slate-700 font-mono tracking-widest leading-none block">{t.sigLine}</span>
+          </div>
+          <div className="text-right leading-none">
+            <span className="text-[7.5px] font-bold text-slate-450 dark:text-slate-500">{t.dateLine}</span>
+          </div>
+
+          {hoveredSection === 'signature' && (
+            <div className="absolute -bottom-6 right-0 bg-emerald-600 text-white font-extrabold px-2 py-1 rounded-lg shadow-xl text-[8px] md:text-[9px] z-30 animate-fade-in whitespace-nowrap">
+              💡 {t.tooltipSig}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// Custom Animated Pricing Badge Component
+function AnimatedPricingBadge({ t }) {
+  return (
+    <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white/70 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 select-none">
+      <div className="flex items-center gap-1.5">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span className="text-[9px] md:text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          {t.specialOffer}
+        </span>
+      </div>
+      
+      <div className="h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+      <div className="flex items-center gap-2">
+        {/* Slashed original price (dynamically strikes through) */}
+        <span className="text-xs font-bold text-slate-400 dark:text-slate-500 animate-strike-through">
+          {t.originalPrice}
+        </span>
+        
+        <span className="text-[10px] text-slate-400 font-extrabold">➔</span>
+
+        {/* Glow pulsing sale price */}
+        <span className="px-2.5 py-1 bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md animate-glow-green border border-emerald-400">
+          {t.offerPrice}
+        </span>
+      </div>
+
+      <span className="hidden sm:inline-block text-[8px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/40 px-2 py-0.5 rounded-lg">
+        SAVE 37%
+      </span>
+    </div>
+  );
+}
+
+// Interactive Template Card Component
+function TemplateCard({ id, name, category, description, defaultColor, lang, onSelect }) {
+  return (
+    <div 
+      onClick={() => onSelect(id)}
+      className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all duration-350 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-1.5 relative overflow-hidden"
+    >
+      <div className="absolute top-0 left-0 w-full h-1.5 transition-colors" style={{ backgroundColor: defaultColor }}></div>
+
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full">
+            {category}
+          </span>
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: defaultColor }}></span>
+        </div>
+
+        <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          {name}
+        </h4>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+          {description}
+        </p>
+
+        {/* Small Visual Layout Schema Representation */}
+        <div className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl mt-4 p-2.5 flex gap-2 relative overflow-hidden transition-colors">
+          {id === '3' ? (
+            /* Sidebar layout style representation */
+            <>
+              <div className="w-1/3 h-full rounded bg-indigo-500/10 dark:bg-indigo-500/5 border-r border-indigo-500/10 flex flex-col gap-1.5 p-1">
+                <div className="w-5 h-5 rounded-full bg-indigo-500/30"></div>
+                <div className="w-full h-1 bg-indigo-500/20 rounded"></div>
+                <div className="w-2/3 h-1 bg-indigo-500/20 rounded"></div>
+                <div className="flex gap-0.5 mt-1">
+                  <div className="w-2 h-1.5 rounded-sm bg-indigo-500/30"></div>
+                  <div className="w-2 h-1.5 rounded-sm bg-indigo-500/30"></div>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col gap-1.5 p-1">
+                <div className="w-2/3 h-2 bg-slate-300 dark:bg-slate-700 rounded"></div>
+                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-5/6 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-1/2 h-1.5 bg-slate-300 dark:bg-slate-700 rounded mt-1"></div>
+              </div>
+            </>
+          ) : id === '2' ? (
+            /* Government layout style representation */
+            <div className="w-full flex flex-col gap-1.5 justify-between h-full p-1">
+              <div className="space-y-1">
+                <div className="w-1/2 h-2 bg-slate-300 dark:bg-slate-700 rounded mx-auto"></div>
+                <div className="w-full h-0.5 bg-slate-200 dark:bg-slate-800"></div>
+              </div>
+              <div className="space-y-1">
+                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+              </div>
+              <div className="flex justify-between items-end mt-1">
+                <div className="w-10 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-12 h-3.5 border border-dashed border-slate-300 dark:border-slate-700 rounded flex items-center justify-center text-[5px] text-slate-400">Signature</div>
+              </div>
+            </div>
+          ) : (
+            /* Minimalist standard layout representation */
+            <div className="w-full flex flex-col gap-1.5 p-1">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-slate-250 dark:bg-slate-850 flex items-center justify-center text-[8px]">👤</div>
+                <div className="flex-1 space-y-1">
+                  <div className="w-1/2 h-1.5 bg-slate-300 dark:bg-slate-700 rounded"></div>
+                  <div className="w-1/3 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                </div>
+              </div>
+              <div className="w-full h-0.5 bg-slate-250 dark:bg-slate-800 mt-0.5"></div>
+              <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+              <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+              <div className="w-3/4 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between">
+        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-1.5 transition-transform flex items-center gap-1">
+          {lang === 'si' ? 'මෙම Template එකෙන් හදන්න' : 'Use Template'} ➔
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const router = useRouter();
   const [lang, setLang] = useState('en');
@@ -12,7 +359,7 @@ export default function LandingPage() {
   // Initialize theme & language preferences
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const isDark = localStorage.getItem('darkMode') !== 'false'; // Dark mode default
+      const isDark = localStorage.getItem('darkMode') !== 'false';
       setDarkMode(isDark);
       if (isDark) {
         document.documentElement.classList.add('dark');
@@ -48,22 +395,27 @@ export default function LandingPage() {
     router.push(`/builder?lang=${lang}`);
   };
 
+  const selectTemplate = (templateId) => {
+    router.push(`/builder?template=${templateId}&lang=${lang}`);
+  };
+
   const t = TRANSLATIONS[lang];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 selection:bg-indigo-500/35 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 selection:bg-indigo-500/35 relative overflow-hidden bg-grid-pattern">
       
       {/* Background Glowing Blobs */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-10 left-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Top Navbar */}
-      <header className="h-16 px-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex justify-between items-center z-20 shadow-sm sticky top-0 transition-colors duration-300">
+      <header className="h-16 px-6 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center z-20 shadow-sm sticky top-0 transition-colors duration-300">
         <div className="flex items-center gap-3">
           <span className="text-xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
             {t.title}
           </span>
-          <span className="hidden sm:inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-150 dark:border-indigo-900">
+          <span className="hidden sm:inline-block text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
             {t.tagline}
           </span>
         </div>
@@ -73,7 +425,7 @@ export default function LandingPage() {
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-150 dark:border-indigo-900 rounded-lg text-xs font-extrabold jelly-btn"
+            className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-150 dark:border-indigo-900/50 rounded-lg text-xs font-black jelly-btn"
           >
             🌐 {t.langToggle}
           </button>
@@ -100,66 +452,133 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-6 max-w-5xl mx-auto text-center space-y-8">
-        
-        {/* Special Pricing Badge overlay */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-900/40 rounded-full text-xs font-bold text-emerald-400 shadow-sm animate-bounce mb-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>{t.specialOffer}: </span>
-          <span className="line-through text-slate-500 mr-1">{t.originalPrice}</span>
-          <span className="text-emerald-300 font-black">{t.offerPrice}</span>
+      <section className="relative py-12 md:py-20 px-6 max-w-6xl mx-auto z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          {/* Left Text Column */}
+          <div className="lg:col-span-7 text-center lg:text-left space-y-6 flex flex-col items-center lg:items-start">
+            
+            {/* Custom pricing badge */}
+            <AnimatedPricingBadge t={t} />
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight uppercase max-w-3xl">
+              {t.heroHeading}
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+              {t.heroSubheading}
+            </p>
+
+            {/* CTA Jelly Button */}
+            <div className="pt-4 flex flex-wrap gap-4 justify-center lg:justify-start w-full">
+              <button
+                type="button"
+                onClick={startCv}
+                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/35 transition-all jelly-btn relative overflow-hidden group"
+              >
+                <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                {t.startBuilding}
+              </button>
+              
+              <a 
+                href="#templates"
+                className="px-6 py-4 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-extrabold text-sm md:text-base rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-850 transition-all jelly-btn flex items-center justify-center"
+              >
+                {lang === 'si' ? 'Templates බලන්න 👁️' : 'Browse Templates 👁️'}
+              </a>
+            </div>
+          </div>
+
+          {/* Right Interactive Mockup Column */}
+          <div className="lg:col-span-5 flex justify-center w-full">
+            <CvMockup lang={lang} />
+          </div>
+
+        </div>
+      </section>
+
+      {/* Template Showcase Section */}
+      <section id="templates" className="py-20 px-6 max-w-6xl mx-auto space-y-12 z-10 relative">
+        <div className="text-center space-y-4">
+          <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full">
+            {lang === 'si' ? 'CV ආකෘති' : 'LankaCV Layouts'}
+          </span>
+          <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+            {lang === 'si' ? 'ඔබට කැමති Template එකකින් ආරම්භ කරන්න' : 'Start with a Template Built for Success'}
+          </h2>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+            {lang === 'si' 
+              ? 'අපගේ templates දේශීය HR ප්‍රමිතීන්ට අනුව සකසා ඇත. ඔබට අවශ්‍ය template එක ක්ලික් කර එතැන් සිට CV එක ලිවීම ආරම්භ කරන්න.'
+              : 'Choose one of our premium templates styled perfectly for corporate, IT, banking, or government sector applications in Sri Lanka.'}
+          </p>
         </div>
 
-        {/* Title */}
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight uppercase max-w-4xl mx-auto">
-          {t.heroHeading}
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          {t.heroSubheading}
-        </p>
-
-        {/* CTA Jelly Button */}
-        <div className="pt-4 flex justify-center">
-          <button
-            type="button"
-            onClick={startCv}
-            className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/35 transition-all jelly-btn relative overflow-hidden group"
-          >
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            {t.startBuilding}
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+          <TemplateCard 
+            id="1"
+            name={lang === 'si' ? 'Minimalist Standard' : 'Minimalist Standard'}
+            category={lang === 'si' ? 'පොදු / Corporate' : 'General / Corporate'}
+            description={lang === 'si' ? 'සරල සහ වෘත්තීය නිමාවක්. ඕනෑම රැකියාවකට සුදුසුයි.' : 'Clean, simple, and formal layout suitable for almost any job role.'}
+            defaultColor="#1e3a8a"
+            lang={lang}
+            onSelect={selectTemplate}
+          />
+          <TemplateCard 
+            id="2"
+            name={lang === 'si' ? 'රාජ්‍ය අංශයේ නිල ආකෘතිය' : 'Official Government Format'}
+            category={lang === 'si' ? 'රාජ්‍ය / සිවිල් අංශ' : 'Government / Banking'}
+            description={lang === 'si' ? 'ලංකාවේ රාජ්‍ය අංශයේ ප්‍රමිතිවලට අනුව NIC, Civil Status සහ අත්සන් කිරීමේ කොටස් සහිතයි.' : 'Strict official format featuring signature blocks, NIC details, and civil status required for state sectors.'}
+            defaultColor="#0f172a"
+            lang={lang}
+            onSelect={selectTemplate}
+          />
+          <TemplateCard 
+            id="3"
+            name={lang === 'si' ? 'නවීන IT / තාක්ෂණික' : 'Modern IT / Engineering'}
+            category={lang === 'si' ? 'IT / Engineering' : 'IT & Engineering'}
+            description={lang === 'si' ? 'තාක්ෂණික කුසලතා, sidebar එකක් සහ project විස්තර ලස්සනට පෙන්වීමට සකසන ලද්දකි.' : 'Sleek two-column layout with sidebar and technology tags designed to highlight technical roles.'}
+            defaultColor="#4f46e5"
+            lang={lang}
+            onSelect={selectTemplate}
+          />
         </div>
       </section>
 
       {/* Steps / How It Works Section */}
-      <section className="py-16 px-6 bg-white/40 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800 transition-colors duration-300 relative">
+      <section className="py-20 px-6 bg-white/40 dark:bg-slate-900/30 border-y border-slate-200 dark:border-slate-800/80 transition-colors duration-300 relative z-10">
         <div className="max-w-5xl mx-auto space-y-12">
-          <h2 className="text-xl md:text-2xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
+          <h2 className="text-xl md:text-3xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
             {t.howItWorks}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Step 1 */}
-            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-6 rounded-2xl shadow-sm jelly-card flex flex-col justify-between items-center space-y-4">
-              <span className="text-3xl">✍️</span>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">{t.step1}</h3>
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-8 rounded-3xl shadow-sm jelly-card flex flex-col items-center text-center space-y-4 relative overflow-hidden group">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform">
+                ✍️
+              </div>
+              <h3 className="text-sm md:text-base font-black uppercase tracking-wider text-slate-800 dark:text-white">{t.step1}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{t.step1Desc}</p>
             </div>
 
             {/* Step 2 */}
-            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-6 rounded-2xl shadow-sm jelly-card flex flex-col justify-between items-center space-y-4">
-              <span className="text-3xl">👁️</span>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">{t.step2}</h3>
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-8 rounded-3xl shadow-sm jelly-card flex flex-col items-center text-center space-y-4 relative overflow-hidden group">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform">
+                👁️
+              </div>
+              <h3 className="text-sm md:text-base font-black uppercase tracking-wider text-slate-800 dark:text-white">{t.step2}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{t.step2Desc}</p>
             </div>
 
             {/* Step 3 */}
-            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-6 rounded-2xl shadow-sm jelly-card flex flex-col justify-between items-center space-y-4">
-              <span className="text-3xl">📥</span>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">{t.step3}</h3>
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-850 p-8 rounded-3xl shadow-sm jelly-card flex flex-col items-center text-center space-y-4 relative overflow-hidden group">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform">
+                📥
+              </div>
+              <h3 className="text-sm md:text-base font-black uppercase tracking-wider text-slate-800 dark:text-white">{t.step3}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{t.step3Desc}</p>
             </div>
 
@@ -168,28 +587,28 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-6 max-w-5xl mx-auto space-y-12">
-        <h2 className="text-xl md:text-2xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
+      <section className="py-20 px-6 max-w-5xl mx-auto space-y-12 z-10 relative">
+        <h2 className="text-xl md:text-3xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
           {lang === 'si' ? 'විශේෂ පහසුකම්' : 'Key Features'}
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800 p-5 rounded-2xl jelly-card">
-            <span className="text-2xl block mb-3">📍</span>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature1Title}</h4>
+          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800/80 p-6 rounded-3xl jelly-card">
+            <span className="text-3xl block mb-4">📍</span>
+            <h4 className="text-xs md:text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature1Title}</h4>
             <p className="text-xs text-slate-500 leading-relaxed">{t.feature1Desc}</p>
           </div>
 
-          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800 p-5 rounded-2xl jelly-card">
-            <span className="text-2xl block mb-3">🎨</span>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature2Title}</h4>
+          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800/80 p-6 rounded-3xl jelly-card">
+            <span className="text-3xl block mb-4">🎨</span>
+            <h4 className="text-xs md:text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature2Title}</h4>
             <p className="text-xs text-slate-500 leading-relaxed">{t.feature2Desc}</p>
           </div>
 
-          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800 p-5 rounded-2xl jelly-card">
-            <span className="text-2xl block mb-3">💸</span>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature3Title}</h4>
+          <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur border border-slate-200 dark:border-slate-800/80 p-6 rounded-3xl jelly-card">
+            <span className="text-3xl block mb-4">💸</span>
+            <h4 className="text-xs md:text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white mb-2">{t.feature3Title}</h4>
             <p className="text-xs text-slate-500 leading-relaxed">{t.feature3Desc}</p>
           </div>
 
@@ -197,9 +616,9 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-10 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] text-slate-500 max-w-5xl mx-auto">
+      <footer className="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] md:text-xs text-slate-500 max-w-5xl mx-auto px-6 space-y-2">
         <p>© {new Date().getFullYear()} {t.title} (Pvt) Ltd. All Rights Reserved. WhatsApp Support: +94 78 923 2752</p>
-        <p className="mt-1 opacity-70">Designed and built specifically for the Sri Lankan job vacancy market.</p>
+        <p className="opacity-75">Designed and built specifically for the Sri Lankan job vacancy market.</p>
       </footer>
 
     </div>

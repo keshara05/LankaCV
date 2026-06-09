@@ -27,6 +27,35 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Custom Premium Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes drawStrike {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px 6px rgba(16, 185, 129, 0.5);
+    border-color: rgba(16, 185, 129, 0.8);
+    transform: scale(1.03);
+  }
+}
+
 /* Custom Premium Utilities */
 @utility jelly-btn {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.35);
@@ -47,8 +76,44 @@ body {
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@utility animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+@utility animate-strike-through {
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    width: 0%;
+    height: 3px;
+    background: #ef4444;
+    transform: translateY(-50%) rotate(-6deg);
+    border-radius: 99px;
+    animation: drawStrike 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.3s forwards;
+  }
+}
+
+@utility animate-glow-green {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@utility bg-grid-pattern {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
 }
 
 /* Hide scrollbar utility */
@@ -59,4 +124,5 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 

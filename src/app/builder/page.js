@@ -22,8 +22,21 @@ function BuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialLang = searchParams.get('lang') === 'si' ? 'si' : 'en';
+  const initialTemplateId = searchParams.get('template');
 
-  const [cvData, setCvData] = useState(INITIAL_CV_DATA);
+  const [cvData, setCvData] = useState(() => {
+    if (initialTemplateId) {
+      const template = TEMPLATES.find(t => t.id === initialTemplateId);
+      if (template) {
+        return {
+          ...INITIAL_CV_DATA,
+          templateId: initialTemplateId,
+          themeColor: template.defaultColor
+        };
+      }
+    }
+    return INITIAL_CV_DATA;
+  });
   const [mobileTab, setMobileTab] = useState('edit'); // 'edit' or 'preview'
   const [isSaving, setIsSaving] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
