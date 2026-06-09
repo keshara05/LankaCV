@@ -1,215 +1,416 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+
+const STATUS_CONFIG = {
+  pending:  { label: 'Pending',  bg: '#FAEEDA', color: '#854F0B', dot: '#BA7517' },
+  approved: { label: 'Approved', bg: '#E1F5EE', color: '#085041', dot: '#0F6E56' },
+  rejected: { label: 'Rejected', bg: '#FCEBEB', color: '#791F1F', dot: '#A32D2D' },
+};
+
+function StatusBadge({ status }) {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontSize: 10, fontWeight: 600, padding: '3px 9px',
+      borderRadius: 20, background: cfg.bg, color: cfg.color,
+      border: `0.5px solid ${cfg.dot}`, textTransform: 'capitalize',
+      letterSpacing: '0.03em',
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
+      {cfg.label}
+    </span>
+  );
+}
+
+function StatCard({ label, value, color }) {
+  return (
+    <div style={{
+      background: '#F8F9FB', borderRadius: 10, padding: '14px 16px',
+      border: '0.5px solid #E5E7EB', flex: 1, minWidth: 0,
+    }}>
+      <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 600, color }}>{value}</div>
+    </div>
+  );
+}
 
 export default function AdminPage() {
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedSlip, setSelectedSlip] = useState(null); // Modal view for slip image
+  const [loading, setLoading]           = useState(true);
+  const [filter, setFilter]             = useState('all');
+  const [selectedSlip, setSelectedSlip] = useState(null);
+  const [updating, setUpdating]         = useState(null); // txId being updated
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await fetch('/api/transactions');
+      const res  = await fetch('/api/transactions');
       const data = await res.json();
-      if (!data.error) {
-        setTransactions(data);
-      }
+      if (!data.error) setTransactions(data);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchTransactions();
   }, []);
 
+  useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
+
   const handleStatusUpdate = async (txId, nextStatus) => {
+    setUpdating(txId);
     try {
       const res = await fetch('/api/transactions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ txId, status: nextStatus })
+        body: JSON.stringify({ txId, status: nextStatus }),
       });
-      if (res.ok) {
-        fetchTransactions();
-      }
+      if (res.ok) await fetchTransactions();
     } catch (err) {
       console.error(err);
+    } finally {
+      setUpdating(null);
     }
   };
 
   const handleExportPDF = (cvId, name) => {
-    // Open the server-side PDF generator API endpoint in a new tab or trigger a download
-    const cleanFilename = `${name.replace(/\s+/g, '_')}_CV.pdf`;
-    window.open(`/api/export-pdf?cvId=${cvId}&filename=${encodeURIComponent(cleanFilename)}`, '_blank');
+    const filename = `${name.replace(/\s+/g, '_')}_CV.pdf`;
+    window.open(`/api/export-pdf?cvId=${cvId}&filename=${encodeURIComponent(filename)}`, '_blank');
   };
+
+  const filtered = filter === 'all'
+    ? transactions
+    : transactions.filter(tx => tx.status === filter);
+
+  const counts = {
+    all:      transactions.length,
+    pending:  transactions.filter(t => t.status === 'pending').length,
+    approved: transactions.filter(t => t.status === 'approved').length,
+    rejected: transactions.filter(t => t.status === 'rejected').length,
+  };
+
+  // ─── Styles ──────────────────────────────────────────────────────────────────
+
+  const s = {
+    page: {
+      minHeight: '100vh',
+      background: '#F3F4F6',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      color: '#111827',
+    },
+    topBar: {
+      background: '#fff',
+      borderBottom: '0.5px solid #E5E7EB',
+      padding: '0 28px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      height: 56,
+    },
+    brand: { display: 'flex', alignItems: 'center', gap: 10 },
+    brandIcon: {
+      width: 32, height: 32, borderRadius: 8,
+      background: '#185FA5', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    },
+    brandTitle: { fontSize: 14, fontWeight: 700, color: '#111827', letterSpacing: '-0.01em' },
+    brandSub: { fontSize: 11, color: '#9CA3AF' },
+    refreshBtn: {
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      fontSize: 12, padding: '6px 14px', borderRadius: 8,
+      border: '0.5px solid #D1D5DB', background: '#fff', color: '#374151',
+      cursor: 'pointer', fontWeight: 500,
+    },
+    content: { padding: '24px 28px', maxWidth: 1200, margin: '0 auto' },
+    statsRow: { display: 'flex', gap: 10, marginBottom: 20 },
+    tableCard: {
+      background: '#fff',
+      border: '0.5px solid #E5E7EB',
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    tableHeader: {
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '14px 20px', borderBottom: '0.5px solid #E5E7EB',
+    },
+    tableTitle: { fontSize: 13, fontWeight: 600, color: '#111827' },
+    filterTabs: { display: 'flex', gap: 4 },
+    thead: { background: '#F9FAFB', borderBottom: '0.5px solid #E5E7EB' },
+    th: {
+      padding: '10px 16px', fontSize: 10, fontWeight: 700,
+      color: '#6B7280', textAlign: 'left', letterSpacing: '0.05em',
+      textTransform: 'uppercase', whiteSpace: 'nowrap',
+    },
+    td: { padding: '12px 16px', fontSize: 12, verticalAlign: 'middle' },
+    mono: { fontFamily: '"SF Mono", "Fira Code", monospace', fontSize: 11, color: '#185FA5', fontWeight: 600 },
+    userName: { fontSize: 12, fontWeight: 600, color: '#111827' },
+    userEmail: { fontSize: 11, color: '#6B7280', marginTop: 1 },
+    cvBadge: { fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 2 },
+    bankName: { fontSize: 12, fontWeight: 600, color: '#374151' },
+    waNum: { fontSize: 11, color: '#059669', marginTop: 2 },
+    txDate: { fontSize: 10, color: '#9CA3AF', marginTop: 2 },
+    iconBtn: (variant) => ({
+      width: 28, height: 28, borderRadius: 7,
+      border: '0.5px solid',
+      borderColor: variant === 'approve' ? '#9FE1CB' : variant === 'reject' ? '#F7C1C1' : '#D1D5DB',
+      background: variant === 'approve' ? '#E1F5EE' : variant === 'reject' ? '#FCEBEB' : '#fff',
+      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 13,
+      color: variant === 'approve' ? '#0F6E56' : variant === 'reject' ? '#A32D2D' : '#6B7280',
+    }),
+    exportBtn: {
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontSize: 11, padding: '5px 11px', borderRadius: 7,
+      border: '0.5px solid #185FA5', background: '#185FA5', color: '#fff',
+      cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap',
+    },
+    slipBtn: {
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontSize: 11, padding: '5px 10px', borderRadius: 7,
+      border: '0.5px solid #E5E7EB', background: '#F9FAFB', color: '#374151',
+      cursor: 'pointer', fontWeight: 500,
+    },
+    actionsCell: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+    emptyRow: { textAlign: 'center', padding: '3rem', color: '#9CA3AF', fontSize: 13 },
+    // Modal overlay using min-height trick (no position:fixed)
+    modalOverlay: {
+      position: 'fixed', inset: 0, zIndex: 50,
+      background: 'rgba(0,0,0,0.55)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+    },
+    modalBox: {
+      background: '#fff', borderRadius: 14, width: '100%', maxWidth: 440,
+      overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
+    },
+    modalHead: {
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '14px 18px', borderBottom: '0.5px solid #E5E7EB',
+    },
+    modalBody: {
+      padding: 16, background: '#F9FAFB',
+      display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 220,
+    },
+    modalFoot: {
+      padding: '12px 16px', borderTop: '0.5px solid #E5E7EB',
+      display: 'flex', justifyContent: 'flex-end', gap: 8,
+    },
+    closeBtn: {
+      width: 28, height: 28, borderRadius: 7, border: '0.5px solid #E5E7EB',
+      background: '#F3F4F6', cursor: 'pointer', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', fontSize: 16, color: '#6B7280', lineHeight: 1,
+    },
+    loadingWrap: {
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: '#F3F4F6', color: '#6B7280', fontSize: 14, gap: 10,
+    },
+  };
+
+  const filterTabStyle = (val) => ({
+    fontSize: 11, padding: '4px 11px', borderRadius: 7, cursor: 'pointer', fontWeight: 500,
+    border: '0.5px solid',
+    borderColor: filter === val ? '#185FA5' : '#E5E7EB',
+    background: filter === val ? '#EBF4FF' : '#fff',
+    color: filter === val ? '#185FA5' : '#6B7280',
+  });
+
+  // ─── Render ───────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-slate-900 text-slate-500">
-        <span className="animate-spin mr-2">⏳</span> Loading admin portal...
+      <div style={s.loadingWrap}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+        </svg>
+        Loading admin portal…
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-      
-      {/* Top Header */}
-      <header className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
-        <div>
-          <h1 className="text-xl font-black tracking-tight text-white uppercase">LankaCV Admin</h1>
-          <p className="text-xs text-slate-500">Manage bank transfers and export pixel-perfect, watermark-free PDFs.</p>
-        </div>
-        <button
-          onClick={fetchTransactions}
-          className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 text-xs font-bold rounded-lg border border-slate-700 transition"
-        >
-          🔄 Refresh
-        </button>
-      </header>
+    <div style={s.page}>
 
-      {/* Transactions Grid */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-                <th className="py-3.5 px-4">Tx ID</th>
-                <th className="py-3.5 px-4">User Details</th>
-                <th className="py-3.5 px-4">Payment Info</th>
-                <th className="py-3.5 px-4">Receipt Slip</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-850">
-              {transactions.length === 0 ? (
+      {/* Top bar */}
+      <div style={s.topBar}>
+        <div style={s.brand}>
+          <div style={s.brandIcon}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="16" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <div style={s.brandTitle}>LankaCV Admin</div>
+            <div style={s.brandSub}>Manage transfers · Export clean PDFs</div>
+          </div>
+        </div>
+        <button style={s.refreshBtn} onClick={fetchTransactions}>
+          ↺ Refresh
+        </button>
+      </div>
+
+      <div style={s.content}>
+
+        {/* Stats */}
+        <div style={s.statsRow}>
+          <StatCard label="Total transactions" value={counts.all}      color="#185FA5" />
+          <StatCard label="Pending review"     value={counts.pending}  color="#BA7517" />
+          <StatCard label="Approved"           value={counts.approved} color="#0F6E56" />
+          <StatCard label="Rejected"           value={counts.rejected} color="#A32D2D" />
+        </div>
+
+        {/* Table card */}
+        <div style={s.tableCard}>
+          <div style={s.tableHeader}>
+            <span style={s.tableTitle}>Payment transactions</span>
+            <div style={s.filterTabs}>
+              {['all', 'pending', 'approved', 'rejected'].map(f => (
+                <button key={f} style={filterTabStyle(f)} onClick={() => setFilter(f)}>
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                  {' '}
+                  <span style={{ opacity: 0.65 }}>({counts[f]})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead style={s.thead}>
                 <tr>
-                  <td colSpan="6" className="py-10 text-center text-slate-500 italic">
-                    No transactions or payment slips uploaded yet.
-                  </td>
+                  {['Tx ID', 'User details', 'Payment info', 'Receipt', 'Status', 'Actions'].map(h => (
+                    <th key={h} style={s.th}>{h}</th>
+                  ))}
                 </tr>
-              ) : (
-                transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-slate-850/50 transition-colors">
-                    <td className="py-4 px-4 font-mono text-indigo-400 font-bold">{tx.id}</td>
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-200">{tx.full_name}</div>
-                      <div className="text-[10px] text-slate-500">{tx.email}</div>
-                      <div className="text-[10px] text-indigo-300 font-mono mt-0.5">CV: {tx.cv_id}</div>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} style={s.emptyRow}>
+                      No transactions found.
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="font-semibold text-slate-300">{tx.bank_name}</div>
+                  </tr>
+                ) : filtered.map((tx, i) => (
+                  <tr
+                    key={tx.id}
+                    style={{
+                      borderBottom: i < filtered.length - 1 ? '0.5px solid #F3F4F6' : 'none',
+                      background: updating === tx.id ? '#F9FAFB' : '#fff',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => { if (updating !== tx.id) e.currentTarget.style.background = '#F9FAFB'; }}
+                    onMouseLeave={e => { if (updating !== tx.id) e.currentTarget.style.background = '#fff'; }}
+                  >
+                    {/* Tx ID */}
+                    <td style={s.td}>
+                      <span style={s.mono}>#{tx.id}</span>
+                    </td>
+
+                    {/* User details */}
+                    <td style={s.td}>
+                      <div style={s.userName}>{tx.full_name}</div>
+                      <div style={s.userEmail}>{tx.email}</div>
+                      <div style={s.cvBadge}>CV: {tx.cv_id}</div>
+                    </td>
+
+                    {/* Payment info */}
+                    <td style={s.td}>
+                      <div style={s.bankName}>{tx.bank_name}</div>
                       {tx.whatsapp_number && (
-                        <div className="text-[10px] text-emerald-400 font-mono mt-0.5">
-                          WhatsApp: {tx.whatsapp_number}
-                        </div>
+                        <div style={s.waNum}>WhatsApp: {tx.whatsapp_number}</div>
                       )}
-                      <div className="text-[9px] text-slate-500 mt-0.5">
-                        Date: {new Date(tx.created_at).toLocaleString()}
+                      <div style={s.txDate}>
+                        {new Date(tx.created_at).toLocaleString('en-GB', {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit',
+                        })}
                       </div>
                     </td>
-                    <td className="py-4 px-4">
+
+                    {/* Receipt slip */}
+                    <td style={s.td}>
                       {tx.payment_slip ? (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedSlip(tx.payment_slip)}
-                          className="px-2.5 py-1 bg-indigo-950 text-indigo-300 hover:bg-indigo-900 border border-indigo-850 rounded text-[10px] font-bold transition"
-                        >
-                          👁️ View Slip
+                        <button style={s.slipBtn} onClick={() => setSelectedSlip(tx.payment_slip)}>
+                          🧾 View slip
                         </button>
                       ) : (
-                        <span className="text-slate-600 italic">No file</span>
+                        <span style={{ fontSize: 11, color: '#D1D5DB' }}>—</span>
                       )}
                     </td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        tx.status === 'approved' 
-                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-900' 
-                          : tx.status === 'rejected'
-                          ? 'bg-rose-950 text-rose-400 border border-rose-900'
-                          : 'bg-amber-950 text-amber-400 border border-amber-900'
-                      }`}>
-                        {tx.status}
-                      </span>
+
+                    {/* Status */}
+                    <td style={s.td}>
+                      <StatusBadge status={tx.status} />
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="flex justify-center items-center gap-2">
+
+                    {/* Actions */}
+                    <td style={s.td}>
+                      <div style={s.actionsCell}>
                         {tx.status === 'pending' && (
                           <>
                             <button
-                              type="button"
+                              style={s.iconBtn('approve')}
+                              title="Approve"
+                              disabled={updating === tx.id}
                               onClick={() => handleStatusUpdate(tx.id, 'approved')}
-                              className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-bold text-[10px] transition"
-                            >
-                              Approve
-                            </button>
+                            >✓</button>
                             <button
-                              type="button"
+                              style={s.iconBtn('reject')}
+                              title="Reject"
+                              disabled={updating === tx.id}
                               onClick={() => handleStatusUpdate(tx.id, 'rejected')}
-                              className="px-2 py-1 bg-rose-700 hover:bg-rose-600 text-white rounded font-bold text-[10px] transition"
-                            >
-                              Reject
-                            </button>
+                            >✕</button>
                           </>
                         )}
                         <button
-                          type="button"
+                          style={s.exportBtn}
                           onClick={() => handleExportPDF(tx.cv_id, tx.full_name)}
-                          className="px-2.5 py-1 bg-blue-700 hover:bg-blue-600 text-white font-extrabold rounded text-[10px] transition flex items-center gap-1 shadow-md"
                         >
-                          📥 Export Clean PDF
+                          ↓ Export PDF
                         </button>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      {/* Receipt Slip View Modal */}
+      {/* Receipt slip modal */}
       {selectedSlip && (
-        <div className="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 transition-opacity">
-          <div className="bg-slate-900 border border-slate-800 max-w-lg w-full rounded-2xl overflow-hidden shadow-2xl relative">
-            <button
-              onClick={() => setSelectedSlip(null)}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-white font-bold hover:bg-slate-800 flex items-center justify-center border border-slate-800 transition"
-            >
-              ×
-            </button>
-            <div className="p-4 bg-slate-950 border-b border-slate-850">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-300">Payment Slip Receipt</h3>
+        <div style={s.modalOverlay} onClick={() => setSelectedSlip(null)}>
+          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={s.modalHead}>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>Payment slip</span>
+              <button style={s.closeBtn} onClick={() => setSelectedSlip(null)}>×</button>
             </div>
-            <div className="p-4 flex justify-center bg-slate-950">
+            <div style={s.modalBody}>
               {selectedSlip.startsWith('data:application/pdf') ? (
-                <div className="p-10 text-center text-xs text-slate-400 font-medium">
-                  📄 PDF Receipt Uploaded. Select Actions or click download.
+                <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>
+                  📄 PDF receipt uploaded.
                 </div>
               ) : (
-                <img 
-                  src={selectedSlip} 
-                  alt="Receipt slip" 
-                  className="max-h-[70vh] object-contain border border-slate-800 rounded" 
+                <img
+                  src={selectedSlip}
+                  alt="Payment receipt"
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 8 }}
                 />
               )}
             </div>
-            <div className="p-4 border-t border-slate-850 flex justify-end gap-2">
-              <a 
-                href={selectedSlip} 
-                download="payment_slip" 
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-xs font-bold rounded-lg text-slate-200"
+            <div style={s.modalFoot}>
+              <a
+                href={selectedSlip}
+                download="payment_slip"
+                style={{ ...s.slipBtn, textDecoration: 'none' }}
               >
-                💾 Download Original
+                ↓ Download
               </a>
-              <button 
-                onClick={() => setSelectedSlip(null)} 
-                className="px-3 py-1.5 bg-indigo-650 hover:bg-indigo-600 text-xs font-bold rounded-lg text-white"
+              <button
+                style={{ ...s.exportBtn, background: '#374151', borderColor: '#374151' }}
+                onClick={() => setSelectedSlip(null)}
               >
                 Close
               </button>
