@@ -37,6 +37,16 @@ function StatCard({ label, value, color }) {
 }
 
 export default function AdminPage() {
+  // Authentication States
+  const [authChecking, setAuthChecking] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [focusedField, setFocusedField] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  // Transactions States
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [filter, setFilter]             = useState('all');
@@ -47,16 +57,85 @@ export default function AdminPage() {
     setLoading(true);
     try {
       const res  = await fetch('/api/transactions');
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        return;
+      }
       const data = await res.json();
-      if (!data.error) setTransactions(data);
+      if (!data.error) {
+        setTransactions(data);
+        setIsAuthenticated(true);
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+      setAuthChecking(false);
     }
   }, []);
 
-  useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
+  // Check initial authentication status
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const res = await fetch('/api/admin/check');
+        const data = await res.json();
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+          await fetchTransactions();
+        } else {
+          setIsAuthenticated(false);
+          setLoading(false);
+          setAuthChecking(false);
+        }
+      } catch (err) {
+        console.error(err);
+        setIsAuthenticated(false);
+        setLoading(false);
+        setAuthChecking(false);
+      }
+    };
+    checkAuthStatus();
+  }, [fetchTransactions]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError('');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        setUsername('');
+        setPassword('');
+        await fetchTransactions();
+      } else {
+        setLoginError(data.error || 'Invalid credentials');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setLoginError('Something went wrong. Please try again.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/admin/logout', { method: 'POST' });
+      if (res.ok) {
+        setIsAuthenticated(false);
+        setTransactions([]);
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
 
   const handleStatusUpdate = async (txId, nextStatus) => {
     setUpdating(txId);
@@ -93,6 +172,138 @@ export default function AdminPage() {
   // ─── Styles ──────────────────────────────────────────────────────────────────
 
   const s = {
+    // Auth Styles
+    loginPage: {
+      minHeight: '100vh',
+      background: 'radial-gradient(circle at top right, #1e293b, #0f172a, #020617)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    },
+    loginBgPattern: {
+      position: 'absolute',
+      width: '600px',
+      height: '600px',
+      borderRadius: '50%',
+      background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(30, 58, 138, 0) 70%)',
+      top: '-150px',
+      right: '-150px',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    loginCard: {
+      background: 'rgba(30, 41, 59, 0.45)',
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      borderRadius: 24,
+      width: '100%',
+      maxWidth: 400,
+      padding: '40px 32px',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+      zIndex: 10,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    loginLogoContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%)',
+      border: '1px solid rgba(59, 130, 246, 0.25)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+    },
+    loginLogo: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)',
+    },
+    loginTitle: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: '#fff',
+      margin: '0 0 6px 0',
+      textAlign: 'center',
+      letterSpacing: '-0.01em',
+    },
+    loginSubtitle: {
+      fontSize: 13,
+      color: '#94a3b8',
+      margin: '0 0 28px 0',
+      textAlign: 'center',
+    },
+    loginErrorCard: {
+      width: '100%',
+      background: 'rgba(239, 68, 68, 0.1)',
+      border: '1px solid rgba(239, 68, 68, 0.25)',
+      borderRadius: 12,
+      padding: '10px 14px',
+      color: '#fca5a5',
+      marginBottom: 20,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+    },
+    loginForm: {
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 18,
+    },
+    inputGroup: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    },
+    inputLabel: {
+      fontSize: 11,
+      fontWeight: 600,
+      color: '#94a3b8',
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+    },
+    loginInput: {
+      width: '100%',
+      background: 'rgba(15, 23, 42, 0.6)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: 10,
+      padding: '11px 14px',
+      color: '#fff',
+      fontSize: 13,
+      outline: 'none',
+      transition: 'border-color 0.2s, box-shadow 0.2s',
+      fontFamily: 'inherit',
+    },
+    loginSubmitBtn: {
+      width: '100%',
+      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+      color: '#fff',
+      border: 'none',
+      borderRadius: 10,
+      padding: '12px',
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: 'pointer',
+      transition: 'transform 0.2s, box-shadow 0.2s',
+      marginTop: 6,
+      textAlign: 'center',
+      fontFamily: 'inherit',
+    },
+
+    // Dashboard Styles
     page: {
       minHeight: '100vh',
       background: '#F3F4F6',
@@ -120,6 +331,12 @@ export default function AdminPage() {
       fontSize: 12, padding: '6px 14px', borderRadius: 8,
       border: '0.5px solid #D1D5DB', background: '#fff', color: '#374151',
       cursor: 'pointer', fontWeight: 500,
+    },
+    logoutBtn: {
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      fontSize: 12, padding: '6px 14px', borderRadius: 8,
+      border: '0.5px solid #F3F4F6', background: '#FCEBEB', color: '#A32D2D',
+      cursor: 'pointer', fontWeight: 600, transition: 'background 0.15s',
     },
     content: { padding: '24px 28px', maxWidth: 1200, margin: '0 auto' },
     statsRow: { display: 'flex', gap: 10, marginBottom: 20 },
@@ -172,7 +389,6 @@ export default function AdminPage() {
     },
     actionsCell: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
     emptyRow: { textAlign: 'center', padding: '3rem', color: '#9CA3AF', fontSize: 13 },
-    // Modal overlay using min-height trick (no position:fixed)
     modalOverlay: {
       position: 'fixed', inset: 0, zIndex: 50,
       background: 'rgba(0,0,0,0.55)',
@@ -213,13 +429,114 @@ export default function AdminPage() {
     color: filter === val ? '#185FA5' : '#6B7280',
   });
 
-  // ─── Render ───────────────────────────────────────────────────────────────────
+  // ─── Render Authentication Checking ───────────────────────────────────────────
+  if (authChecking) {
+    return (
+      <div style={s.loadingWrap}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+        Verifying administrator session…
+      </div>
+    );
+  }
 
+  // ─── Render Login Screen ───────────────────────────────────────────────────────
+  if (!isAuthenticated) {
+    return (
+      <div style={s.loginPage}>
+        <div style={s.loginBgPattern} />
+        <div style={s.loginCard}>
+          <div style={s.loginLogoContainer}>
+            <div style={s.loginLogo}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+          <h1 style={s.loginTitle}>Secure Admin Portal</h1>
+          <p style={s.loginSubtitle}>Please sign in to manage transactions</p>
+
+          {loginError && (
+            <div style={s.loginErrorCard}>
+              <span style={{ fontSize: 14 }}>⚠️</span>
+              <div style={{ fontSize: 12, fontWeight: 500 }}>{loginError}</div>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} style={s.loginForm}>
+            <div style={s.inputGroup}>
+              <label style={s.inputLabel}>Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onFocus={() => setFocusedField('username')}
+                onBlur={() => setFocusedField('')}
+                placeholder="Enter admin username"
+                style={{
+                  ...s.loginInput,
+                  borderColor: focusedField === 'username' ? '#3b82f6' : 'rgba(255,255,255,0.1)',
+                  boxShadow: focusedField === 'username' ? '0 0 0 2px rgba(59, 130, 246, 0.25)' : 'none'
+                }}
+                required
+              />
+            </div>
+
+            <div style={s.inputGroup}>
+              <label style={s.inputLabel}>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField('')}
+                placeholder="Enter security password"
+                style={{
+                  ...s.loginInput,
+                  borderColor: focusedField === 'password' ? '#3b82f6' : 'rgba(255,255,255,0.1)',
+                  boxShadow: focusedField === 'password' ? '0 0 0 2px rgba(59, 130, 246, 0.25)' : 'none'
+                }}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loginLoading}
+              style={loginLoading ? { ...s.loginSubmitBtn, opacity: 0.7, cursor: 'not-allowed' } : s.loginSubmitBtn}
+              onMouseEnter={(e) => {
+                if (!loginLoading) {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loginLoading) {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              {loginLoading ? 'Verifying credentials…' : 'Access Dashboard →'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Render Dashboard ──────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div style={s.loadingWrap}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+          </circle>
         </svg>
         Loading admin portal…
       </div>
@@ -245,9 +562,19 @@ export default function AdminPage() {
             <div style={s.brandSub}>Manage transfers · Export clean PDFs</div>
           </div>
         </div>
-        <button style={s.refreshBtn} onClick={fetchTransactions}>
-          ↺ Refresh
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button style={s.refreshBtn} onClick={fetchTransactions}>
+            ↺ Refresh
+          </button>
+          <button
+            style={s.logoutBtn}
+            onClick={handleLogout}
+            onMouseEnter={e => e.currentTarget.style.background = '#FADBD8'}
+            onMouseLeave={e => e.currentTarget.style.background = '#FCEBEB'}
+          >
+            🔒 Logout
+          </button>
+        </div>
       </div>
 
       <div style={s.content}>

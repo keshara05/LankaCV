@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getCV } from '@/lib/db';
 import { getTemplateHtml } from '@/components/PreviewPanel/templates';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET(request) {
   try {
+    if (!(await verifyAuth())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const cvId = searchParams.get('cvId');
     const filename = searchParams.get('filename') || 'CV.pdf';

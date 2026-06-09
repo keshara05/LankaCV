@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createTransaction, getTransactions, updateTransactionStatus } from '@/lib/db';
+import { verifyAuth } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -21,6 +22,9 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    if (!(await verifyAuth())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const list = await getTransactions();
     return NextResponse.json(list);
   } catch (err) {
@@ -31,6 +35,9 @@ export async function GET(request) {
 
 export async function PATCH(request) {
   try {
+    if (!(await verifyAuth())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const { txId, status } = await request.json();
     if (!txId || !status) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
