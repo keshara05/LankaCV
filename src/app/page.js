@@ -4,9 +4,31 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TRANSLATIONS } from '@/lib/translations';
 
-// Interactive, CSS-animated CV Mockup Component
+// Interactive, CSS-animated CV Mockup Component with 3D Tilt Effect
 function CvMockup({ lang }) {
   const [hoveredSection, setHoveredSection] = useState(null);
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, shineX: 50, shineY: 50 });
+
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const box = card.getBoundingClientRect();
+    const x = e.clientX - box.left;
+    const y = e.clientY - box.top;
+    
+    // Calculate rotation (-10 to 10 degrees)
+    const rotateX = -((y - box.height / 2) / (box.height / 2)) * 12;
+    const rotateY = ((x - box.width / 2) / (box.width / 2)) * 12;
+    
+    // Calculate shine position
+    const shineX = (x / box.width) * 100;
+    const shineY = (y / box.height) * 100;
+    
+    setTilt({ rotateX, rotateY, shineX, shineY });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ rotateX: 0, rotateY: 0, shineX: 50, shineY: 50 });
+  };
 
   const t = {
     en: {
@@ -72,9 +94,26 @@ function CvMockup({ lang }) {
   }[lang];
 
   return (
-    <div className="relative group/mockup animate-float max-w-md mx-auto w-full">
+    <div 
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) scale(1.02)`,
+        transition: 'transform 0.15s cubic-bezier(0.25, 1, 0.5, 1)',
+        transformStyle: 'preserve-3d'
+      }}
+      className="relative group/mockup max-w-md mx-auto w-full cursor-pointer animate-float-jelly"
+    >
       {/* Background glow shadow effect */}
-      <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-500/20 to-emerald-500/25 rounded-3xl blur-2xl opacity-70 group-hover/mockup:opacity-100 transition duration-1000"></div>
+      <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-500/20 to-emerald-500/25 rounded-3xl blur-2xl opacity-75 group-hover/mockup:opacity-100 transition duration-500"></div>
+
+      {/* Shine overlay */}
+      <div 
+        className="absolute inset-0 rounded-2xl pointer-events-none z-30 opacity-0 group-hover/mockup:opacity-25 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at ${tilt.shineX}% ${tilt.shineY}%, rgba(255, 255, 255, 0.85) 0%, transparent 60%)`,
+        }}
+      />
 
       {/* CV Sheet Container */}
       <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-2xl p-5 md:p-6 text-left text-[9px] md:text-[10px] text-slate-700 dark:text-slate-350 transition-colors duration-300">
@@ -83,7 +122,7 @@ function CvMockup({ lang }) {
         <div 
           onMouseEnter={() => setHoveredSection('header')}
           onMouseLeave={() => setHoveredSection(null)}
-          className={`flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'header' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+          className={`flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'header' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30 scale-[1.01]' : ''}`}
         >
           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-white text-sm md:text-base font-black shadow-inner">
             KR
@@ -108,7 +147,7 @@ function CvMockup({ lang }) {
         <div 
           onMouseEnter={() => setHoveredSection('nic')}
           onMouseLeave={() => setHoveredSection(null)}
-          className={`mt-3 grid grid-cols-2 gap-2 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'nic' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+          className={`mt-3 grid grid-cols-2 gap-2 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'nic' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30 scale-[1.01]' : ''}`}
         >
           <div>
             <span className="text-slate-400 dark:text-slate-500 block font-bold uppercase text-[6px]">NIC Number</span>
@@ -130,7 +169,7 @@ function CvMockup({ lang }) {
         <div 
           onMouseEnter={() => setHoveredSection('education')}
           onMouseLeave={() => setHoveredSection(null)}
-          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'education' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'education' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30 scale-[1.01]' : ''}`}
         >
           <h5 className="font-black text-slate-900 dark:text-white border-b border-indigo-500/20 pb-0.5 mb-1 uppercase tracking-wider text-[7px] md:text-[8px]">{t.education}</h5>
           
@@ -179,7 +218,7 @@ function CvMockup({ lang }) {
         <div 
           onMouseEnter={() => setHoveredSection('experience')}
           onMouseLeave={() => setHoveredSection(null)}
-          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'experience' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+          className={`mt-3 cursor-help transition-all duration-300 rounded-lg p-1 ${hoveredSection === 'experience' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30 scale-[1.01]' : ''}`}
         >
           <h5 className="font-black text-slate-900 dark:text-white border-b border-indigo-500/20 pb-0.5 mb-1 uppercase tracking-wider text-[7px] md:text-[8px]">{t.experience}</h5>
           
@@ -202,7 +241,7 @@ function CvMockup({ lang }) {
         <div 
           onMouseEnter={() => setHoveredSection('signature')}
           onMouseLeave={() => setHoveredSection(null)}
-          className={`mt-3 pt-2.5 border-t border-dashed border-slate-250 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 flex justify-between items-end ${hoveredSection === 'signature' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30' : ''}`}
+          className={`mt-3 pt-2.5 border-t border-dashed border-slate-250 dark:border-slate-800/80 cursor-help transition-all duration-300 rounded-lg p-1 flex justify-between items-end ${hoveredSection === 'signature' ? 'bg-indigo-500/5 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30 scale-[1.01]' : ''}`}
         >
           <div className="space-y-0.5">
             <span className="text-slate-450 dark:text-slate-500 block text-[6px] uppercase font-bold">{t.signature}</span>
@@ -227,7 +266,7 @@ function CvMockup({ lang }) {
 // Custom Animated Pricing Badge Component
 function AnimatedPricingBadge({ t }) {
   return (
-    <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white/70 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 select-none">
+    <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-white/70 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 select-none animate-float-subtle">
       <div className="flex items-center gap-1.5">
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -266,16 +305,16 @@ function TemplateCard({ id, name, category, description, defaultColor, lang, onS
   return (
     <div 
       onClick={() => onSelect(id)}
-      className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all duration-350 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-1.5 relative overflow-hidden"
+      className="group rounded-3xl p-6 shadow-sm hover:shadow-2xl border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-2 relative overflow-hidden glass-card jelly-card animate-fade-in-up"
     >
       <div className="absolute top-0 left-0 w-full h-1.5 transition-colors" style={{ backgroundColor: defaultColor }}></div>
 
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[9px] font-black uppercase px-2.5 py-1 bg-slate-100/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200/50 dark:border-slate-700/50">
             {category}
           </span>
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: defaultColor }}></span>
+          <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: defaultColor }}></span>
         </div>
 
         <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
@@ -286,7 +325,7 @@ function TemplateCard({ id, name, category, description, defaultColor, lang, onS
         </p>
 
         {/* Small Visual Layout Schema Representation */}
-        <div className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl mt-4 p-2.5 flex gap-2 relative overflow-hidden transition-colors">
+        <div className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl mt-5 p-2.5 flex gap-2 relative overflow-hidden transition-colors">
           {id === '3' ? (
             /* Sidebar layout style representation */
             <>
@@ -333,7 +372,7 @@ function TemplateCard({ id, name, category, description, defaultColor, lang, onS
                   <div className="w-1/3 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
                 </div>
               </div>
-              <div className="w-full h-0.5 bg-slate-250 dark:bg-slate-800 mt-0.5"></div>
+              <div className="w-full h-0.5 bg-slate-250 dark:bg-slate-850 mt-0.5"></div>
               <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
               <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
               <div className="w-3/4 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
@@ -343,7 +382,7 @@ function TemplateCard({ id, name, category, description, defaultColor, lang, onS
       </div>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-1.5 transition-transform flex items-center gap-1">
+        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-2 transition-transform flex items-center gap-1">
           {lang === 'si' ? 'මෙම Template එකෙන් හදන්න' : 'Use Template'} ➔
         </span>
       </div>
@@ -409,50 +448,54 @@ export default function LandingPage() {
       <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-10 left-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Top Navbar */}
-      <header className="h-16 px-6 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center z-20 shadow-sm sticky top-0 transition-colors duration-300">
-        <div className="flex items-center gap-3">
-          <span className="text-xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
-            {t.title}
-          </span>
-          <span className="hidden sm:inline-block text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
-            {t.tagline}
-          </span>
-        </div>
+      {/* Floating Glass Navbar */}
+      <div className="sticky top-4 z-50 px-4 w-full max-w-6xl mx-auto animate-fade-in-up">
+        <header className="h-16 px-6 glass-nav rounded-2xl flex justify-between items-center shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-indigo-400 dark:from-indigo-400 dark:to-indigo-300 bg-clip-text text-transparent">
+              {t.title}
+            </span>
+            <span className="hidden sm:inline-block text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100/50 dark:border-indigo-900/40">
+              {t.tagline}
+            </span>
+          </div>
 
-        <div className="flex items-center gap-3">
-          {/* Language Toggle */}
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-150 dark:border-indigo-900/50 rounded-lg text-xs font-black jelly-btn"
-          >
-            🌐 {t.langToggle}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Language Toggle */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-150 dark:border-indigo-900/50 rounded-lg text-xs font-black jelly-btn"
+            >
+              🌐 {t.langToggle}
+            </button>
 
-          {/* Dark Mode Toggle */}
-          <button
-            type="button"
-            onClick={toggleDarkMode}
-            className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-bold jelly-btn"
-            title="Toggle Light/Dark Mode"
-          >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
+            {/* Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleDarkMode}
+              className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-bold jelly-btn"
+              title="Toggle Light/Dark Mode"
+            >
+              <span className="inline-block transition-transform duration-500 hover:rotate-45">
+                {darkMode ? '☀️' : '🌙'}
+              </span>
+            </button>
 
-          {/* Builder direct button */}
-          <button
-            type="button"
-            onClick={startCv}
-            className="hidden sm:block px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-lg shadow-md hover:shadow-lg transition-all jelly-btn"
-          >
-            {lang === 'si' ? 'CV එකක් සාදන්න ➔' : 'Create CV ➔'}
-          </button>
-        </div>
-      </header>
+            {/* Builder direct button */}
+            <button
+              type="button"
+              onClick={startCv}
+              className="hidden sm:block px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-extrabold text-xs rounded-lg shadow-md hover:shadow-lg transition-all jelly-btn"
+            >
+              {lang === 'si' ? 'CV එකක් සාදන්න ➔' : 'Create CV ➔'}
+            </button>
+          </div>
+        </header>
+      </div>
 
       {/* Hero Section */}
-      <section className="relative py-12 md:py-20 px-6 max-w-6xl mx-auto z-10">
+      <section className="relative py-16 md:py-24 px-6 max-w-6xl mx-auto z-10 animate-fade-in-up delay-100">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Text Column */}
@@ -476,7 +519,7 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={startCv}
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/35 transition-all jelly-btn relative overflow-hidden group"
+                className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/35 transition-all jelly-btn relative overflow-hidden group"
               >
                 <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                 {t.startBuilding}

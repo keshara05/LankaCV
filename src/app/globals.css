@@ -56,27 +56,71 @@ body {
   }
 }
 
-/* Custom Premium Utilities */
+/* Custom Premium Utilities & Animations */
 @utility jelly-btn {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.35);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
 
   &:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.4);
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.5);
   }
 
   &:active {
-    transform: scale(0.96) translateY(0);
+    transform: scale(0.94) translateY(0);
+  }
+}
+
+@utility jelly-btn-emerald {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.94) translateY(0);
   }
 }
 
 @utility jelly-card {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.12), 0 12px 15px -5px rgba(0, 0, 0, 0.06);
+  }
+  
+  &:active {
+    transform: translateY(-2px) scale(0.99);
+  }
+}
+
+@utility glass-nav {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+
+  .dark & {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  
+  .dark & {
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 }
 
@@ -86,6 +130,23 @@ body {
 
 @utility animate-float-subtle {
   animation: float-subtle 4s ease-in-out infinite;
+}
+
+@utility animate-float-jelly {
+  animation: floatJelly 5s ease-in-out infinite;
+}
+
+@utility animate-bobbing {
+  animation: bobbing 3s ease-in-out infinite;
+}
+
+@utility animate-radar-ping {
+  animation: radarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@utility animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
 }
 
 @utility animate-strike-through {
@@ -112,8 +173,16 @@ body {
 @utility bg-grid-pattern {
   background-size: 30px 30px;
   background-image: 
-    linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+}
+
+@utility perspective-1000 {
+  perspective: 1000px;
+}
+
+@utility transform-style-3d {
+  transform-style: preserve-3d;
 }
 
 /* Hide scrollbar utility */
@@ -124,5 +193,58 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes floatJelly {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  33% {
+    transform: translateY(-8px) scale(1.02, 0.98);
+  }
+  66% {
+    transform: translateY(4px) scale(0.98, 1.02);
+  }
+}
+
+@keyframes bobbing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes radarPing {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Entry Transitions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
 
 

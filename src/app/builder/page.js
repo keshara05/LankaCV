@@ -116,87 +116,91 @@ function BuilderContent() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       
-      {/* Top Navbar */}
-      <header className="h-16 px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center z-20 shadow-sm sticky top-0 transition-colors duration-300">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/')}>
-          <span className="text-lg font-black tracking-tight text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform">
-            {t.title}
-          </span>
-          <span className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-            {t.tagline}
-          </span>
-        </div>
+      {/* Floating Glass Navbar */}
+      <div className="sticky top-0 z-50 px-4 pt-4 w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <header className="h-16 px-6 glass-nav rounded-2xl flex justify-between items-center shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/')}>
+            <span className="text-lg font-black tracking-tight text-indigo-600 dark:text-indigo-400 hover:scale-[1.03] transition-transform">
+              {t.title}
+            </span>
+            <span className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100/30 dark:border-indigo-900/40">
+              {t.tagline}
+            </span>
+          </div>
 
-        {/* Builder Toolbar Options */}
-        <div className="flex items-center gap-4">
-          
-          {/* Template Selector */}
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">Template:</span>
-            <select
-              value={cvData.templateId}
-              onChange={(e) => handleTemplateChange(e.target.value)}
-              className="px-2 py-1.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none"
-            >
-              {TEMPLATES.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+          {/* Builder Toolbar Options */}
+          <div className="flex items-center gap-3">
+            
+            {/* Template Selector */}
+            <div className="hidden md:flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Template:</span>
+              <select
+                value={cvData.templateId}
+                onChange={(e) => handleTemplateChange(e.target.value)}
+                className="px-2 py-1.5 border border-slate-200 dark:border-slate-805 bg-white dark:bg-slate-900 rounded-lg text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+              >
+                {TEMPLATES.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Color Customizer */}
+            <div className="hidden lg:flex items-center gap-2 px-2 py-1 bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/50 dark:border-slate-800/80 rounded-xl">
+              {THEME_COLORS.map((color) => (
+                <button
+                  key={color.name}
+                  type="button"
+                  onClick={() => setCvData({ ...cvData, themeColor: color.hex })}
+                  className={`w-4 h-4 rounded-full border transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-75 ${cvData.themeColor === color.hex ? 'scale-125 border-slate-900 dark:border-white shadow-md' : 'border-transparent hover:scale-110'}`}
+                  style={{ backgroundColor: color.hex }}
+                  title={color.name}
+                />
               ))}
-            </select>
+            </div>
+
+            {/* Language Selector Button */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-900 rounded-lg text-xs font-extrabold jelly-btn"
+            >
+              🌐 {t.langToggle}
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleDarkMode}
+              className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-bold jelly-btn"
+              title="Toggle Light/Dark Mode"
+            >
+              <span className="inline-block transition-transform duration-550 hover:rotate-45">
+                {darkMode ? '☀️' : '🌙'}
+              </span>
+            </button>
+
+            {/* Checkout Button */}
+            <button
+              type="button"
+              onClick={handleSaveAndCheckout}
+              disabled={isSaving}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-1 jelly-btn-emerald"
+            >
+              {isSaving ? t.saving : t.finishBtn}
+            </button>
           </div>
-
-          {/* Color Customizer */}
-          <div className="hidden lg:flex items-center gap-1.5">
-            {THEME_COLORS.map((color) => (
-              <button
-                key={color.name}
-                type="button"
-                onClick={() => setCvData({ ...cvData, themeColor: color.hex })}
-                className={`w-5 h-5 rounded-full border transition-transform ${cvData.themeColor === color.hex ? 'scale-125 border-slate-900 dark:border-white' : 'border-transparent hover:scale-110'}`}
-                style={{ backgroundColor: color.hex }}
-                title={color.name}
-              />
-            ))}
-          </div>
-
-          {/* Language Selector Button */}
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900 rounded-lg text-xs font-extrabold jelly-btn"
-          >
-            🌐 {t.langToggle}
-          </button>
-
-          {/* Dark Mode Toggle */}
-          <button
-            type="button"
-            onClick={toggleDarkMode}
-            className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-xs font-bold jelly-btn"
-            title="Toggle Light/Dark Mode"
-          >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
-
-          {/* Checkout Button */}
-          <button
-            type="button"
-            onClick={handleSaveAndCheckout}
-            disabled={isSaving}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-1 jelly-btn"
-          >
-            {isSaving ? t.saving : t.finishBtn}
-          </button>
-        </div>
-      </header>
+        </header>
+      </div>
 
       {/* Mobile Toolbar Option Bar */}
-      <div className="md:hidden flex justify-between items-center px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+      <div className="md:hidden flex justify-between items-center px-6 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300 mt-2">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-slate-500">Template:</span>
+          <span className="text-[10px] font-bold text-slate-400">Template:</span>
           <select
             value={cvData.templateId}
             onChange={(e) => handleTemplateChange(e.target.value)}
-            className="px-2 py-1 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg text-[10px] font-bold"
+            className="px-2 py-1 border border-slate-250 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg text-[10px] font-bold"
           >
             {TEMPLATES.map(t => (
               <option key={t.id} value={t.id}>{t.name}</option>
@@ -204,13 +208,13 @@ function BuilderContent() {
           </select>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {THEME_COLORS.slice(0, 5).map((color) => (
             <button
               key={color.name}
               type="button"
               onClick={() => setCvData({ ...cvData, themeColor: color.hex })}
-              className={`w-4 h-4 rounded-full border ${cvData.themeColor === color.hex ? 'border-slate-950 dark:border-white scale-110' : 'border-transparent'}`}
+              className={`w-4 h-4 rounded-full border transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-75 ${cvData.themeColor === color.hex ? 'border-slate-950 dark:border-white scale-125 shadow-sm' : 'border-transparent hover:scale-110'}`}
               style={{ backgroundColor: color.hex }}
             />
           ))}
@@ -218,12 +222,12 @@ function BuilderContent() {
       </div>
 
       {/* Mobile Screen Switch Tabs */}
-      <div className="sm:hidden flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
+      <div className="sm:hidden flex border-b border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-900 transition-colors duration-300">
         <button
           onClick={() => setMobileTab('edit')}
-          className={`flex-1 py-3 text-center text-xs font-extrabold tracking-wider uppercase transition-colors ${
+          className={`flex-1 py-3 text-center text-xs font-extrabold tracking-wider uppercase transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             mobileTab === 'edit' 
-              ? 'border-b-2 border-indigo-600 text-indigo-600 bg-slate-50/50 dark:bg-slate-950/20' 
+              ? 'border-b-3 border-indigo-600 text-indigo-600 bg-slate-50/50 dark:bg-slate-950/20' 
               : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950/20'
           }`}
         >
@@ -231,9 +235,9 @@ function BuilderContent() {
         </button>
         <button
           onClick={() => setMobileTab('preview')}
-          className={`flex-1 py-3 text-center text-xs font-extrabold tracking-wider uppercase transition-colors ${
+          className={`flex-1 py-3 text-center text-xs font-extrabold tracking-wider uppercase transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             mobileTab === 'preview' 
-              ? 'border-b-2 border-indigo-600 text-indigo-600 bg-slate-50/50 dark:bg-slate-950/20' 
+              ? 'border-b-3 border-indigo-600 text-indigo-600 bg-slate-50/50 dark:bg-slate-950/20' 
               : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950/20'
           }`}
         >

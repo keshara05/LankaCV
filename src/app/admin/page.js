@@ -3,36 +3,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 const STATUS_CONFIG = {
-  pending:  { label: 'Pending',  bg: '#FAEEDA', color: '#854F0B', dot: '#BA7517' },
-  approved: { label: 'Approved', bg: '#E1F5EE', color: '#085041', dot: '#0F6E56' },
-  rejected: { label: 'Rejected', bg: '#FCEBEB', color: '#791F1F', dot: '#A32D2D' },
+  pending:  { label: 'Pending',  bg: 'rgba(250, 238, 218, 0.4)', color: '#854F0B', dot: '#BA7517' },
+  approved: { label: 'Approved', bg: 'rgba(225, 245, 238, 0.4)', color: '#085041', dot: '#0F6E56' },
+  rejected: { label: 'Rejected', bg: 'rgba(252, 235, 235, 0.4)', color: '#791F1F', dot: '#A32D2D' },
 };
 
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 10, fontWeight: 600, padding: '3px 9px',
-      borderRadius: 20, background: cfg.bg, color: cfg.color,
-      border: `0.5px solid ${cfg.dot}`, textTransform: 'capitalize',
-      letterSpacing: '0.03em',
-    }}>
-      <span style={{ width: 5, height: 5, borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
+    <span 
+      className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border text-xs capitalize tracking-wide select-none"
+      style={{ background: cfg.bg, color: cfg.color, borderColor: cfg.dot }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: cfg.dot }} />
       {cfg.label}
     </span>
-  );
-}
-
-function StatCard({ label, value, color }) {
-  return (
-    <div style={{
-      background: '#F8F9FB', borderRadius: 10, padding: '14px 16px',
-      border: '0.5px solid #E5E7EB', flex: 1, minWidth: 0,
-    }}>
-      <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 600, color }}>{value}</div>
-    </div>
   );
 }
 
@@ -56,7 +41,7 @@ export default function AdminPage() {
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     try {
-      const res  = await fetch('/api/transactions');
+      const res = await fetch('/api/transactions');
       if (res.status === 401) {
         setIsAuthenticated(false);
         return;
@@ -169,276 +154,14 @@ export default function AdminPage() {
     rejected: transactions.filter(t => t.status === 'rejected').length,
   };
 
-  // ─── Styles ──────────────────────────────────────────────────────────────────
-
-  const s = {
-    // Auth Styles
-    loginPage: {
-      minHeight: '100vh',
-      background: 'radial-gradient(circle at top right, #1e293b, #0f172a, #020617)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      padding: '20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    },
-    loginBgPattern: {
-      position: 'absolute',
-      width: '600px',
-      height: '600px',
-      borderRadius: '50%',
-      background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(30, 58, 138, 0) 70%)',
-      top: '-150px',
-      right: '-150px',
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-    loginCard: {
-      background: 'rgba(30, 41, 59, 0.45)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      borderRadius: 24,
-      width: '100%',
-      maxWidth: 400,
-      padding: '40px 32px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
-      zIndex: 10,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    loginLogoContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 16,
-      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%)',
-      border: '1px solid rgba(59, 130, 246, 0.25)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 20,
-    },
-    loginLogo: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
-      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)',
-    },
-    loginTitle: {
-      fontSize: 20,
-      fontWeight: 700,
-      color: '#fff',
-      margin: '0 0 6px 0',
-      textAlign: 'center',
-      letterSpacing: '-0.01em',
-    },
-    loginSubtitle: {
-      fontSize: 13,
-      color: '#94a3b8',
-      margin: '0 0 28px 0',
-      textAlign: 'center',
-    },
-    loginErrorCard: {
-      width: '100%',
-      background: 'rgba(239, 68, 68, 0.1)',
-      border: '1px solid rgba(239, 68, 68, 0.25)',
-      borderRadius: 12,
-      padding: '10px 14px',
-      color: '#fca5a5',
-      marginBottom: 20,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10,
-    },
-    loginForm: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 18,
-    },
-    inputGroup: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 6,
-    },
-    inputLabel: {
-      fontSize: 11,
-      fontWeight: 600,
-      color: '#94a3b8',
-      textTransform: 'uppercase',
-      letterSpacing: '0.05em',
-    },
-    loginInput: {
-      width: '100%',
-      background: 'rgba(15, 23, 42, 0.6)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: 10,
-      padding: '11px 14px',
-      color: '#fff',
-      fontSize: 13,
-      outline: 'none',
-      transition: 'border-color 0.2s, box-shadow 0.2s',
-      fontFamily: 'inherit',
-    },
-    loginSubmitBtn: {
-      width: '100%',
-      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-      color: '#fff',
-      border: 'none',
-      borderRadius: 10,
-      padding: '12px',
-      fontSize: 13,
-      fontWeight: 600,
-      cursor: 'pointer',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      marginTop: 6,
-      textAlign: 'center',
-      fontFamily: 'inherit',
-    },
-
-    // Dashboard Styles
-    page: {
-      minHeight: '100vh',
-      background: '#F3F4F6',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      color: '#111827',
-    },
-    topBar: {
-      background: '#fff',
-      borderBottom: '0.5px solid #E5E7EB',
-      padding: '0 28px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: 56,
-    },
-    brand: { display: 'flex', alignItems: 'center', gap: 10 },
-    brandIcon: {
-      width: 32, height: 32, borderRadius: 8,
-      background: '#185FA5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    },
-    brandTitle: { fontSize: 14, fontWeight: 700, color: '#111827', letterSpacing: '-0.01em' },
-    brandSub: { fontSize: 11, color: '#9CA3AF' },
-    refreshBtn: {
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      fontSize: 12, padding: '6px 14px', borderRadius: 8,
-      border: '0.5px solid #D1D5DB', background: '#fff', color: '#374151',
-      cursor: 'pointer', fontWeight: 500,
-    },
-    logoutBtn: {
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      fontSize: 12, padding: '6px 14px', borderRadius: 8,
-      border: '0.5px solid #F3F4F6', background: '#FCEBEB', color: '#A32D2D',
-      cursor: 'pointer', fontWeight: 600, transition: 'background 0.15s',
-    },
-    content: { padding: '24px 28px', maxWidth: 1200, margin: '0 auto' },
-    statsRow: { display: 'flex', gap: 10, marginBottom: 20 },
-    tableCard: {
-      background: '#fff',
-      border: '0.5px solid #E5E7EB',
-      borderRadius: 12,
-      overflow: 'hidden',
-    },
-    tableHeader: {
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '14px 20px', borderBottom: '0.5px solid #E5E7EB',
-    },
-    tableTitle: { fontSize: 13, fontWeight: 600, color: '#111827' },
-    filterTabs: { display: 'flex', gap: 4 },
-    thead: { background: '#F9FAFB', borderBottom: '0.5px solid #E5E7EB' },
-    th: {
-      padding: '10px 16px', fontSize: 10, fontWeight: 700,
-      color: '#6B7280', textAlign: 'left', letterSpacing: '0.05em',
-      textTransform: 'uppercase', whiteSpace: 'nowrap',
-    },
-    td: { padding: '12px 16px', fontSize: 12, verticalAlign: 'middle' },
-    mono: { fontFamily: '"SF Mono", "Fira Code", monospace', fontSize: 11, color: '#185FA5', fontWeight: 600 },
-    userName: { fontSize: 12, fontWeight: 600, color: '#111827' },
-    userEmail: { fontSize: 11, color: '#6B7280', marginTop: 1 },
-    cvBadge: { fontSize: 10, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 2 },
-    bankName: { fontSize: 12, fontWeight: 600, color: '#374151' },
-    waNum: { fontSize: 11, color: '#059669', marginTop: 2 },
-    txDate: { fontSize: 10, color: '#9CA3AF', marginTop: 2 },
-    iconBtn: (variant) => ({
-      width: 28, height: 28, borderRadius: 7,
-      border: '0.5px solid',
-      borderColor: variant === 'approve' ? '#9FE1CB' : variant === 'reject' ? '#F7C1C1' : '#D1D5DB',
-      background: variant === 'approve' ? '#E1F5EE' : variant === 'reject' ? '#FCEBEB' : '#fff',
-      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 13,
-      color: variant === 'approve' ? '#0F6E56' : variant === 'reject' ? '#A32D2D' : '#6B7280',
-    }),
-    exportBtn: {
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 11, padding: '5px 11px', borderRadius: 7,
-      border: '0.5px solid #185FA5', background: '#185FA5', color: '#fff',
-      cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap',
-    },
-    slipBtn: {
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 11, padding: '5px 10px', borderRadius: 7,
-      border: '0.5px solid #E5E7EB', background: '#F9FAFB', color: '#374151',
-      cursor: 'pointer', fontWeight: 500,
-    },
-    actionsCell: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-    emptyRow: { textAlign: 'center', padding: '3rem', color: '#9CA3AF', fontSize: 13 },
-    modalOverlay: {
-      position: 'fixed', inset: 0, zIndex: 50,
-      background: 'rgba(0,0,0,0.55)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
-    },
-    modalBox: {
-      background: '#fff', borderRadius: 14, width: '100%', maxWidth: 440,
-      overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
-    },
-    modalHead: {
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '14px 18px', borderBottom: '0.5px solid #E5E7EB',
-    },
-    modalBody: {
-      padding: 16, background: '#F9FAFB',
-      display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 220,
-    },
-    modalFoot: {
-      padding: '12px 16px', borderTop: '0.5px solid #E5E7EB',
-      display: 'flex', justifyContent: 'flex-end', gap: 8,
-    },
-    closeBtn: {
-      width: 28, height: 28, borderRadius: 7, border: '0.5px solid #E5E7EB',
-      background: '#F3F4F6', cursor: 'pointer', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', fontSize: 16, color: '#6B7280', lineHeight: 1,
-    },
-    loadingWrap: {
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      height: '100vh', background: '#F3F4F6', color: '#6B7280', fontSize: 14, gap: 10,
-    },
-  };
-
-  const filterTabStyle = (val) => ({
-    fontSize: 11, padding: '4px 11px', borderRadius: 7, cursor: 'pointer', fontWeight: 500,
-    border: '0.5px solid',
-    borderColor: filter === val ? '#185FA5' : '#E5E7EB',
-    background: filter === val ? '#EBF4FF' : '#fff',
-    color: filter === val ? '#185FA5' : '#6B7280',
-  });
-
   // ─── Render Authentication Checking ───────────────────────────────────────────
   if (authChecking) {
     return (
-      <div style={s.loadingWrap}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round">
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
-          </circle>
+      <div className="flex flex-col justify-center items-center h-screen bg-slate-55 dark:bg-slate-950 text-slate-500">
+        <svg className="animate-spin text-2xl mb-4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round" />
         </svg>
-        Verifying administrator session…
+        <span className="text-xs font-medium tracking-widest uppercase text-slate-405">Verifying administrator session…</span>
       </div>
     );
   }
@@ -446,60 +169,45 @@ export default function AdminPage() {
   // ─── Render Login Screen ───────────────────────────────────────────────────────
   if (!isAuthenticated) {
     return (
-      <div style={s.loginPage}>
-        <div style={s.loginBgPattern} />
-        <div style={s.loginCard}>
-          <div style={s.loginLogoContainer}>
-            <div style={s.loginLogo}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-            </div>
+      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-950 bg-grid-pattern relative overflow-hidden select-none">
+        {/* Glow backgrounds */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full max-w-md glass-card border border-slate-805 rounded-3xl p-8 shadow-2xl flex flex-col items-center z-10 animate-fade-in-up relative">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-950/40 border border-indigo-900/40 flex items-center justify-center mb-5 text-2xl font-black">
+            🔑
           </div>
-          <h1 style={s.loginTitle}>Secure Admin Portal</h1>
-          <p style={s.loginSubtitle}>Please sign in to manage transactions</p>
+          <h1 className="text-xl font-black text-white mb-1 tracking-tight text-center uppercase">Secure Admin Portal</h1>
+          <p className="text-xs text-slate-400 mb-6 text-center">Please sign in to manage transactions</p>
 
           {loginError && (
-            <div style={s.loginErrorCard}>
-              <span style={{ fontSize: 14 }}>⚠️</span>
-              <div style={{ fontSize: 12, fontWeight: 500 }}>{loginError}</div>
+            <div className="w-full bg-rose-950/20 border border-rose-900/40 rounded-xl p-3 text-rose-450 flex items-center gap-2 mb-4 animate-pulse">
+              <span className="text-xs font-bold">⚠️ {loginError}</span>
             </div>
           )}
 
-          <form onSubmit={handleLogin} style={s.loginForm}>
-            <div style={s.inputGroup}>
-              <label style={s.inputLabel}>Username</label>
+          <form onSubmit={handleLogin} className="w-full space-y-4">
+            <div className="space-y-1 text-left">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                onFocus={() => setFocusedField('username')}
-                onBlur={() => setFocusedField('')}
                 placeholder="Enter admin username"
-                style={{
-                  ...s.loginInput,
-                  borderColor: focusedField === 'username' ? '#3b82f6' : 'rgba(255,255,255,0.1)',
-                  boxShadow: focusedField === 'username' ? '0 0 0 2px rgba(59, 130, 246, 0.25)' : 'none'
-                }}
+                className="w-full px-3 py-2 border border-slate-800 bg-slate-955 text-white rounded-xl text-xs outline-none focus:border-indigo-500 transition-colors"
                 required
               />
             </div>
 
-            <div style={s.inputGroup}>
-              <label style={s.inputLabel}>Password</label>
+            <div className="space-y-1 text-left">
+              <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onFocus={() => setFocusedField('password')}
-                onBlur={() => setFocusedField('')}
                 placeholder="Enter security password"
-                style={{
-                  ...s.loginInput,
-                  borderColor: focusedField === 'password' ? '#3b82f6' : 'rgba(255,255,255,0.1)',
-                  boxShadow: focusedField === 'password' ? '0 0 0 2px rgba(59, 130, 246, 0.25)' : 'none'
-                }}
+                className="w-full px-3 py-2 border border-slate-800 bg-slate-955 text-white rounded-xl text-xs outline-none focus:border-indigo-500 transition-colors"
                 required
               />
             </div>
@@ -507,19 +215,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loginLoading}
-              style={loginLoading ? { ...s.loginSubmitBtn, opacity: 0.7, cursor: 'not-allowed' } : s.loginSubmitBtn}
-              onMouseEnter={(e) => {
-                if (!loginLoading) {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loginLoading) {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
+              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all jelly-btn disabled:opacity-50 mt-2"
             >
               {loginLoading ? 'Verifying credentials…' : 'Access Dashboard →'}
             </button>
@@ -532,122 +228,142 @@ export default function AdminPage() {
   // ─── Render Dashboard ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div style={s.loadingWrap}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round">
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
-          </circle>
+      <div className="flex flex-col justify-center items-center h-screen bg-slate-55 dark:bg-slate-950 text-slate-500">
+        <svg className="animate-spin text-2xl mb-4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <circle cx="12" cy="12" r="10" strokeDasharray="30 30" strokeLinecap="round" />
         </svg>
-        Loading admin portal…
+        <span className="text-xs font-medium tracking-widest uppercase text-slate-400">Loading admin portal…</span>
       </div>
     );
   }
 
   return (
-    <div style={s.page}>
-
-      {/* Top bar */}
-      <div style={s.topBar}>
-        <div style={s.brand}>
-          <div style={s.brandIcon}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="8" y1="13" x2="16" y2="13"/>
-              <line x1="8" y1="17" x2="16" y2="17"/>
-            </svg>
+    <div className="min-h-screen bg-slate-55 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 bg-grid-pattern relative pb-12">
+      
+      {/* Top Navbar */}
+      <div className="sticky top-4 z-40 px-4 w-full max-w-7xl mx-auto pt-4 animate-fade-in-up">
+        <header className="h-16 px-6 glass-nav rounded-2xl flex justify-between items-center shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-600/20">
+              🛡️
+            </div>
+            <div>
+              <div className="text-xs font-black tracking-tight text-slate-800 dark:text-white uppercase leading-none">LankaCV Admin</div>
+              <div className="text-[9px] text-slate-450 dark:text-slate-500 mt-1 uppercase font-bold leading-none">Manage transfers · Export clean PDFs</div>
+            </div>
           </div>
-          <div>
-            <div style={s.brandTitle}>LankaCV Admin</div>
-            <div style={s.brandSub}>Manage transfers · Export clean PDFs</div>
+          <div className="flex items-center gap-2">
+            <button 
+              className="px-3 py-1.5 bg-slate-105 dark:bg-slate-800 text-slate-700 dark:text-slate-350 border border-slate-200 dark:border-slate-700/60 rounded-xl text-xs font-bold jelly-btn"
+              onClick={fetchTransactions}
+            >
+              ↺ Refresh
+            </button>
+            <button
+              className="px-3 py-1.5 bg-rose-50 dark:bg-rose-955/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900 rounded-xl text-xs font-black jelly-btn"
+              onClick={handleLogout}
+            >
+              🔒 Logout
+            </button>
           </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button style={s.refreshBtn} onClick={fetchTransactions}>
-            ↺ Refresh
-          </button>
-          <button
-            style={s.logoutBtn}
-            onClick={handleLogout}
-            onMouseEnter={e => e.currentTarget.style.background = '#FADBD8'}
-            onMouseLeave={e => e.currentTarget.style.background = '#FCEBEB'}
-          >
-            🔒 Logout
-          </button>
-        </div>
+        </header>
       </div>
 
-      <div style={s.content}>
-
-        {/* Stats */}
-        <div style={s.statsRow}>
-          <StatCard label="Total transactions" value={counts.all}      color="#185FA5" />
-          <StatCard label="Pending review"     value={counts.pending}  color="#BA7517" />
-          <StatCard label="Approved"           value={counts.approved} color="#0F6E56" />
-          <StatCard label="Rejected"           value={counts.rejected} color="#A32D2D" />
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-fade-in-up delay-100">
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="glass-card border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm jelly-card">
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Transactions</div>
+            <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{counts.all}</div>
+          </div>
+          <div className="glass-card border border-slate-205 dark:border-slate-800 p-5 rounded-2xl shadow-sm jelly-card">
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Pending Review</div>
+            <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{counts.pending}</div>
+          </div>
+          <div className="glass-card border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm jelly-card">
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Approved</div>
+            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-450">{counts.approved}</div>
+          </div>
+          <div className="glass-card border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm jelly-card">
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Rejected</div>
+            <div className="text-2xl font-black text-rose-600 dark:text-rose-455">{counts.rejected}</div>
+          </div>
         </div>
 
-        {/* Table card */}
-        <div style={s.tableCard}>
-          <div style={s.tableHeader}>
-            <span style={s.tableTitle}>Payment transactions</span>
-            <div style={s.filterTabs}>
-              {['all', 'pending', 'approved', 'rejected'].map(f => (
-                <button key={f} style={filterTabStyle(f)} onClick={() => setFilter(f)}>
-                  {f.charAt(0).toUpperCase() + f.slice(1)}
-                  {' '}
-                  <span style={{ opacity: 0.65 }}>({counts[f]})</span>
-                </button>
-              ))}
+        {/* Transactions Table Card */}
+        <div className="glass-card border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800/80 flex flex-wrap justify-between items-center gap-4">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-350">Payment Transactions</h2>
+            
+            {/* Filter Tabs */}
+            <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/50 dark:border-slate-850">
+              {['all', 'pending', 'approved', 'rejected'].map(f => {
+                const isActive = filter === f;
+                return (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-3.5 py-1 text-[10px] font-bold uppercase rounded-lg transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? 'bg-white dark:bg-slate-850 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    {f} ({counts[f]})
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead style={s.thead}>
-                <tr>
-                  {['Tx ID', 'User details', 'Payment info', 'Receipt', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={s.th}>{h}</th>
-                  ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-slate-950/20 border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">Tx ID</th>
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">User details</th>
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">Payment info</th>
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">Receipt</th>
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">Status</th>
+                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-wider text-slate-400">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80 bg-white/30 dark:bg-slate-900/10">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={s.emptyRow}>
+                    <td colSpan={6} className="text-center py-12 text-slate-400 font-semibold text-xs">
                       No transactions found.
                     </td>
                   </tr>
-                ) : filtered.map((tx, i) => (
+                ) : filtered.map((tx) => (
                   <tr
                     key={tx.id}
-                    style={{
-                      borderBottom: i < filtered.length - 1 ? '0.5px solid #F3F4F6' : 'none',
-                      background: updating === tx.id ? '#F9FAFB' : '#fff',
-                      transition: 'background 0.15s',
-                    }}
-                    onMouseEnter={e => { if (updating !== tx.id) e.currentTarget.style.background = '#F9FAFB'; }}
-                    onMouseLeave={e => { if (updating !== tx.id) e.currentTarget.style.background = '#fff'; }}
+                    className={`transition-colors duration-200 hover:bg-slate-50/40 dark:hover:bg-slate-900/30 ${
+                      updating === tx.id ? 'opacity-60 bg-slate-50/20' : ''
+                    }`}
                   >
                     {/* Tx ID */}
-                    <td style={s.td}>
-                      <span style={s.mono}>#{tx.id}</span>
+                    <td className="px-6 py-4 align-middle">
+                      <span className="font-mono font-bold text-xs text-indigo-650 dark:text-indigo-400">#{tx.id}</span>
                     </td>
 
-                    {/* User details */}
-                    <td style={s.td}>
-                      <div style={s.userName}>{tx.full_name}</div>
-                      <div style={s.userEmail}>{tx.email}</div>
-                      <div style={s.cvBadge}>CV: {tx.cv_id}</div>
+                    {/* User Details */}
+                    <td className="px-6 py-4 align-middle">
+                      <div className="text-xs font-black text-slate-850 dark:text-slate-200">{tx.full_name}</div>
+                      <div className="text-[10px] text-slate-450 dark:text-slate-450 mt-0.5">{tx.email}</div>
+                      <div className="inline-block mt-1.5 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-[8px] font-bold font-mono text-slate-550">
+                        CV: {tx.cv_id}
+                      </div>
                     </td>
 
-                    {/* Payment info */}
-                    <td style={s.td}>
-                      <div style={s.bankName}>{tx.bank_name}</div>
+                    {/* Payment Info */}
+                    <td className="px-6 py-4 align-middle">
+                      <div className="text-xs font-bold text-slate-705 dark:text-slate-350">{tx.bank_name}</div>
                       {tx.whatsapp_number && (
-                        <div style={s.waNum}>WhatsApp: {tx.whatsapp_number}</div>
+                        <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">WhatsApp: {tx.whatsapp_number}</div>
                       )}
-                      <div style={s.txDate}>
+                      <div className="text-[9px] text-slate-400 mt-1 font-semibold">
                         {new Date(tx.created_at).toLocaleString('en-GB', {
                           day: 'numeric', month: 'short', year: 'numeric',
                           hour: '2-digit', minute: '2-digit',
@@ -655,44 +371,47 @@ export default function AdminPage() {
                       </div>
                     </td>
 
-                    {/* Receipt slip */}
-                    <td style={s.td}>
+                    {/* Slip */}
+                    <td className="px-6 py-4 align-middle">
                       {tx.payment_slip ? (
-                        <button style={s.slipBtn} onClick={() => setSelectedSlip(tx.payment_slip)}>
+                        <button 
+                          onClick={() => setSelectedSlip(tx.payment_slip)}
+                          className="px-3 py-1.5 border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-850 rounded-xl text-[10px] font-bold jelly-btn hover:border-indigo-500"
+                        >
                           🧾 View slip
                         </button>
                       ) : (
-                        <span style={{ fontSize: 11, color: '#D1D5DB' }}>—</span>
+                        <span className="text-slate-300 dark:text-slate-700">—</span>
                       )}
                     </td>
 
                     {/* Status */}
-                    <td style={s.td}>
+                    <td className="px-6 py-4 align-middle">
                       <StatusBadge status={tx.status} />
                     </td>
 
                     {/* Actions */}
-                    <td style={s.td}>
-                      <div style={s.actionsCell}>
+                    <td className="px-6 py-4 align-middle">
+                      <div className="flex items-center gap-2">
                         {tx.status === 'pending' && (
                           <>
                             <button
-                              style={s.iconBtn('approve')}
-                              title="Approve"
                               disabled={updating === tx.id}
                               onClick={() => handleStatusUpdate(tx.id, 'approved')}
+                              className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-sm flex items-center justify-center jelly-btn"
+                              title="Approve"
                             >✓</button>
                             <button
-                              style={s.iconBtn('reject')}
-                              title="Reject"
                               disabled={updating === tx.id}
                               onClick={() => handleStatusUpdate(tx.id, 'rejected')}
+                              className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-955/20 border border-rose-250 hover:bg-rose-105 dark:hover:bg-rose-955/40 text-rose-700 dark:text-rose-455 font-bold text-sm flex items-center justify-center jelly-btn"
+                              title="Reject"
                             >✕</button>
                           </>
                         )}
                         <button
-                          style={s.exportBtn}
                           onClick={() => handleExportPDF(tx.cv_id, tx.full_name)}
+                          className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-xl shadow shadow-indigo-650/10 hover:shadow-lg transition-all jelly-btn"
                         >
                           ↓ Export PDF
                         </button>
@@ -704,40 +423,50 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+
       </div>
 
-      {/* Receipt slip modal */}
+      {/* Slip Modal */}
       {selectedSlip && (
-        <div style={s.modalOverlay} onClick={() => setSelectedSlip(null)}>
-          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
-            <div style={s.modalHead}>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>Payment slip</span>
-              <button style={s.closeBtn} onClick={() => setSelectedSlip(null)}>×</button>
+        <div 
+          onClick={() => setSelectedSlip(null)} 
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up"
+          >
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+              <span className="text-xs font-black uppercase text-slate-800 dark:text-white">Payment receipt</span>
+              <button 
+                onClick={() => setSelectedSlip(null)} 
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 flex items-center justify-center text-slate-550 border border-slate-200/50 dark:border-slate-700/50 text-sm jelly-btn"
+              >×</button>
             </div>
-            <div style={s.modalBody}>
+            <div className="p-6 bg-slate-50 dark:bg-slate-955/60 border-b border-slate-200 dark:border-slate-800 flex justify-center items-center min-h-[300px]">
               {selectedSlip.startsWith('data:application/pdf') ? (
-                <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>
+                <div className="text-slate-400 font-bold text-xs">
                   📄 PDF receipt uploaded.
                 </div>
               ) : (
                 <img
                   src={selectedSlip}
                   alt="Payment receipt"
-                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 8 }}
+                  className="max-w-full max-h-[50vh] object-contain rounded-2xl shadow-lg border border-slate-200/40"
                 />
               )}
             </div>
-            <div style={s.modalFoot}>
+            <div className="px-6 py-4 flex justify-end gap-2">
               <a
                 href={selectedSlip}
                 download="payment_slip"
-                style={{ ...s.slipBtn, textDecoration: 'none' }}
+                className="px-4 py-2 border border-slate-200 dark:border-slate-750 text-slate-700 dark:text-slate-350 rounded-xl text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-850 transition jelly-btn"
               >
                 ↓ Download
               </a>
               <button
-                style={{ ...s.exportBtn, background: '#374151', borderColor: '#374151' }}
                 onClick={() => setSelectedSlip(null)}
+                className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-black jelly-btn"
               >
                 Close
               </button>

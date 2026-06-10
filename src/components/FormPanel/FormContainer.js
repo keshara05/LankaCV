@@ -55,26 +55,32 @@ export default function FormContainer({ cvData, onChange, lang }) {
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       
       {/* Tabs list */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto scrollbar-none sticky top-0 z-10 px-4 py-2 gap-1 transition-colors duration-300">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-2 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-300 ${
-              activeTab === tab.id
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
-                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            {tab.name}
-          </button>
-        ))}
+      <div className="flex border-b border-slate-200 dark:border-slate-805 bg-white dark:bg-slate-900 overflow-x-auto scrollbar-none sticky top-0 z-10 px-4 py-3 gap-2 transition-colors duration-300">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-95 cursor-pointer ${
+                isActive
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 scale-105'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-800 dark:hover:text-slate-250'
+              }`}
+            >
+              {isActive && (
+                <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full animate-pulse" />
+              )}
+              <span className={isActive ? 'pb-1 block' : ''}>{tab.name}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Dynamic Form Content */}
+      {/* Dynamic Form Content with smooth key-based entry transition */}
       <div className="flex-1 p-5 overflow-y-auto max-w-3xl mx-auto w-full">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm transition-colors duration-300">
+        <div key={activeTab} className="bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800/80 rounded-2xl p-5 md:p-6 shadow-sm transition-colors duration-300 animate-fade-in-up">
           {renderActiveTabContent()}
         </div>
       </div>
@@ -103,7 +109,7 @@ export default function FormContainer({ cvData, onChange, lang }) {
             {t.next}
           </button>
         ) : (
-          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/40 px-3 py-2 rounded-lg border border-indigo-150 dark:border-indigo-900">
+          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/40 px-3 py-2 rounded-lg border border-indigo-150 dark:border-indigo-900 animate-pulse">
             {t.finishMessage}
           </span>
         )}

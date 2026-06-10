@@ -83,14 +83,45 @@ function StatusChecker() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-10 px-4 transition-colors duration-300">
-      <div className="max-w-md w-full mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-md space-y-6 text-center jelly-card transition-colors duration-300">
+    <div className="min-h-screen bg-slate-55 dark:bg-slate-950 flex flex-col justify-center py-10 px-4 transition-colors duration-300 bg-grid-pattern relative">
+      {/* Glow backgrounds */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="max-w-md w-full mx-auto glass-card border border-slate-200 dark:border-slate-800/80 p-8 rounded-3xl shadow-2xl space-y-6 text-center jelly-card transition-colors duration-300 animate-fade-in-up">
+        
+        {/* Animated Radar/Ping Indicator */}
+        {transaction.status === 'pending' && (
+          <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-amber-500/10 border border-amber-500/30 animate-radar-ping pointer-events-none" />
+            <div className="absolute w-14 h-14 rounded-full bg-amber-500/20 border border-amber-500/40 animate-pulse pointer-events-none" />
+            <div className="relative w-10 h-10 rounded-full bg-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 text-base font-bold shadow-inner">
+              ⏳
+            </div>
+          </div>
+        )}
+
+        {transaction.status === 'approved' && (
+          <div className="relative w-20 h-20 mx-auto flex items-center justify-center animate-bounce">
+            <div className="absolute inset-0 rounded-full bg-emerald-500/10 border border-emerald-500/30 animate-radar-ping pointer-events-none" />
+            <div className="relative w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center text-lg font-bold shadow-lg shadow-emerald-500/35">
+              ✓
+            </div>
+          </div>
+        )}
+
+        {transaction.status === 'rejected' && (
+          <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+            <div className="relative w-10 h-10 rounded-full bg-rose-550 text-white flex items-center justify-center text-lg font-bold shadow-lg shadow-rose-500/35">
+              ✕
+            </div>
+          </div>
+        )}
+
         <div>
-          <span className="text-3xl">🎉</span>
           <h1 className="text-lg font-black tracking-tight text-slate-800 dark:text-white uppercase mt-2">
             {t.statusTitle}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             {t.statusSub}
           </p>
         </div>
@@ -100,21 +131,21 @@ function StatusChecker() {
           {t.orderStatus}: {getStatusText(transaction.status)}
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-900 p-4 rounded-xl space-y-2 text-xs text-left transition-colors duration-300">
-          <div className="flex justify-between">
-            <span className="text-slate-400">{lang === 'si' ? 'CV හැඳුනුම් අංකය' : 'CV ID'}:</span>
+        <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-150 dark:border-slate-900 p-4 rounded-xl space-y-2.5 text-xs text-left transition-colors duration-300">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400 font-bold uppercase text-[9px]">{lang === 'si' ? 'CV හැඳුනුම් අංකය' : 'CV ID'}:</span>
             <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{cvId}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-slate-400">{lang === 'si' ? 'ගණුදෙනු අංකය' : 'Transaction ID'}:</span>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400 font-bold uppercase text-[9px]">{lang === 'si' ? 'ගණුදෙනු අංකය' : 'Transaction ID'}:</span>
             <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{transaction.id}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-slate-400">{lang === 'si' ? 'WhatsApp අංකය' : 'WhatsApp Contact'}:</span>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400 font-bold uppercase text-[9px]">{lang === 'si' ? 'WhatsApp අංකය' : 'WhatsApp Contact'}:</span>
             <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{transaction.whatsapp_number || 'Not provided'}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-slate-400">{lang === 'si' ? 'ගෙවීම් ක්‍රමය' : 'Channel'}:</span>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400 font-bold uppercase text-[9px]">{lang === 'si' ? 'ගෙවීම් ක්‍රමය' : 'Channel'}:</span>
             <span className="font-semibold text-slate-800 dark:text-slate-200">{transaction.bank_name}</span>
           </div>
         </div>
@@ -134,7 +165,7 @@ function StatusChecker() {
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg transition-all jelly-btn"
+          className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350 font-bold text-xs rounded-xl transition-all jelly-btn"
         >
           {t.btnAnother}
         </button>
