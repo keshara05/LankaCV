@@ -116,7 +116,15 @@ function CvMockup({ lang }) {
       />
 
       {/* CV Sheet Container */}
-      <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-2xl p-5 md:p-6 text-left text-[9px] md:text-[10px] text-slate-700 dark:text-slate-350 transition-colors duration-300">
+      <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-2xl p-6 md:p-7 text-left text-[10px] md:text-[11px] text-slate-700 dark:text-slate-350 transition-colors duration-300">
+        {/* Pulsing Live Draft Indicator */}
+        <div className="absolute top-4 right-4 z-40 flex items-center gap-1 px-1.5 py-0.5 bg-slate-900/5 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full text-[7px] font-extrabold tracking-wider text-slate-500 dark:text-slate-400">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+          </span>
+          {lang === 'si' ? 'සජීවී පෙරදසුන' : 'LIVE PREVIEW'}
+        </div>
         
         {/* CV Header */}
         <div 
@@ -305,87 +313,177 @@ function TemplateCard({ id, name, category, description, defaultColor, lang, onS
   return (
     <div 
       onClick={() => onSelect(id)}
-      className="group rounded-3xl p-6 shadow-sm hover:shadow-2xl border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-2 relative overflow-hidden glass-card jelly-card animate-fade-in-up"
+      className="group rounded-3xl p-7 shadow-sm hover:shadow-2xl border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-2.5 relative overflow-hidden glass-card jelly-card animate-fade-in-up"
     >
-      <div className="absolute top-0 left-0 w-full h-1.5 transition-colors" style={{ backgroundColor: defaultColor }}></div>
+      <div className="absolute top-0 left-0 w-full h-2 transition-all duration-500 group-hover:h-3" style={{ backgroundColor: defaultColor }}></div>
 
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[9px] font-black uppercase px-2.5 py-1 bg-slate-100/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200/50 dark:border-slate-700/50">
+        <div className="flex items-center justify-between mb-5">
+          <span className="text-[10px] font-black uppercase px-3 py-1 bg-slate-100/90 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200/60 dark:border-slate-700/60">
             {category}
           </span>
-          <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: defaultColor }}></span>
+          <span className="w-3 h-3 rounded-full animate-pulse shadow-md" style={{ backgroundColor: defaultColor }}></span>
         </div>
 
-        <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <h4 className="text-base font-black text-slate-900 dark:text-white uppercase group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors">
           {name}
         </h4>
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed min-h-[40px]">
           {description}
         </p>
 
-        {/* Small Visual Layout Schema Representation */}
-        <div className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl mt-5 p-2.5 flex gap-2 relative overflow-hidden transition-colors">
-          {id === '3' ? (
-            /* Sidebar layout style representation */
-            <>
-              <div className="w-1/3 h-full rounded bg-indigo-500/10 dark:bg-indigo-500/5 border-r border-indigo-500/10 flex flex-col gap-1.5 p-1">
-                <div className="w-5 h-5 rounded-full bg-indigo-500/30"></div>
-                <div className="w-full h-1 bg-indigo-500/20 rounded"></div>
-                <div className="w-2/3 h-1 bg-indigo-500/20 rounded"></div>
-                <div className="flex gap-0.5 mt-1">
-                  <div className="w-2 h-1.5 rounded-sm bg-indigo-500/30"></div>
-                  <div className="w-2 h-1.5 rounded-sm bg-indigo-500/30"></div>
+        {/* Premium Layout Schema Representation */}
+        <div className="w-full h-32 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-2xl mt-6 p-3.5 flex gap-2.5 relative overflow-hidden transition-all duration-500 group-hover:border-indigo-500/30 group-hover:shadow-inner">
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          
+          <div className="w-full h-full flex gap-2.5 transition-transform duration-500 group-hover:scale-[1.04]">
+            {id === '3' ? (
+              /* Sidebar layout style representation */
+              <>
+                <div className="w-1/3 h-full rounded bg-indigo-500/10 dark:bg-indigo-500/5 border-r border-indigo-500/10 flex flex-col gap-2 p-1.5">
+                  <div className="w-6 h-6 rounded-full bg-indigo-500/30 shadow-inner"></div>
+                  <div className="w-full h-1.5 bg-indigo-500/20 rounded"></div>
+                  <div className="w-4/5 h-1.5 bg-indigo-500/20 rounded"></div>
+                  <div className="flex gap-1 mt-1">
+                    <div className="w-3 h-2 rounded-sm bg-indigo-500/30"></div>
+                    <div className="w-3 h-2 rounded-sm bg-indigo-500/30"></div>
+                  </div>
+                </div>
+                <div className="flex-1 flex flex-col gap-2 p-1.5">
+                  <div className="w-2/3 h-2.5 bg-slate-300 dark:bg-slate-700 rounded"></div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  <div className="w-5/6 h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  <div className="w-1/2 h-2 bg-slate-350 dark:bg-slate-755 rounded mt-1"></div>
+                </div>
+              </>
+            ) : id === '2' ? (
+              /* Government layout style representation */
+              <div className="w-full flex flex-col gap-2 justify-between h-full p-1.5">
+                <div className="space-y-1.5">
+                  <div className="w-1/2 h-3 bg-slate-300 dark:bg-slate-700 rounded mx-auto"></div>
+                  <div className="w-full h-0.5 bg-slate-250 dark:bg-slate-800"></div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                </div>
+                <div className="flex justify-between items-end mt-1">
+                  <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  <div className="w-16 h-5 border border-dashed border-slate-300 dark:border-slate-750 rounded flex items-center justify-center text-[6px] font-bold text-slate-400">Signature</div>
                 </div>
               </div>
-              <div className="flex-1 flex flex-col gap-1.5 p-1">
-                <div className="w-2/3 h-2 bg-slate-300 dark:bg-slate-700 rounded"></div>
-                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="w-5/6 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="w-1/2 h-1.5 bg-slate-300 dark:bg-slate-700 rounded mt-1"></div>
-              </div>
-            </>
-          ) : id === '2' ? (
-            /* Government layout style representation */
-            <div className="w-full flex flex-col gap-1.5 justify-between h-full p-1">
-              <div className="space-y-1">
-                <div className="w-1/2 h-2 bg-slate-300 dark:bg-slate-700 rounded mx-auto"></div>
-                <div className="w-full h-0.5 bg-slate-200 dark:bg-slate-800"></div>
-              </div>
-              <div className="space-y-1">
-                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-              </div>
-              <div className="flex justify-between items-end mt-1">
-                <div className="w-10 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                <div className="w-12 h-3.5 border border-dashed border-slate-300 dark:border-slate-700 rounded flex items-center justify-center text-[5px] text-slate-400">Signature</div>
-              </div>
-            </div>
-          ) : (
-            /* Minimalist standard layout representation */
-            <div className="w-full flex flex-col gap-1.5 p-1">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-slate-250 dark:bg-slate-850 flex items-center justify-center text-[8px]">👤</div>
-                <div className="flex-1 space-y-1">
-                  <div className="w-1/2 h-1.5 bg-slate-300 dark:bg-slate-700 rounded"></div>
-                  <div className="w-1/3 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
+            ) : (
+              /* Minimalist standard layout representation */
+              <div className="w-full flex flex-col gap-2 p-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs shadow-inner">👤</div>
+                  <div className="flex-1 space-y-1.5">
+                    <div className="w-1/2 h-2 bg-slate-300 dark:bg-slate-700 rounded"></div>
+                    <div className="w-1/3 h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  </div>
                 </div>
+                <div className="w-full h-0.5 bg-slate-200 dark:bg-slate-800 mt-1"></div>
+                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div className="w-3/4 h-1.5 bg-slate-200 dark:bg-slate-800 rounded"></div>
               </div>
-              <div className="w-full h-0.5 bg-slate-250 dark:bg-slate-850 mt-0.5"></div>
-              <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-              <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-              <div className="w-3/4 h-1 bg-slate-200 dark:bg-slate-800 rounded"></div>
-            </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-850 pt-4">
+        <span className="text-xs font-black text-indigo-650 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-2 transition-transform flex items-center gap-1">
+          {lang === 'si' ? 'මෙම Template එකෙන් හදන්න' : 'Use Template'} ➔
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DraftRecoveryToast({ lang }) {
+  const [visible, setVisible] = useState(false);
+  const [recentId, setRecentId] = useState('');
+  const [recentName, setRecentName] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedId = localStorage.getItem('recentCvId');
+      const storedName = localStorage.getItem('recentCvName');
+      const dismissed = localStorage.getItem('recentCvDismissed') === 'true';
+      
+      if (storedId && !dismissed) {
+        setRecentId(storedId);
+        setRecentName(storedName || 'Guest');
+        setVisible(true);
+      }
+    }
+  }, []);
+
+  const handleDismiss = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('recentCvDismissed', 'true');
+    }
+    setVisible(false);
+  };
+
+  const copyRefId = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(recentId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!visible) return null;
+
+  const t = TRANSLATIONS[lang || 'en'];
+  const descText = t.recoveryDesc.replace('{name}', recentName);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-white/80 dark:bg-slate-900/85 backdrop-blur-xl border border-indigo-500/30 dark:border-indigo-500/20 rounded-2xl shadow-2xl p-4.5 animate-fade-in-up flex flex-col gap-3">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+            {t.recoveryTitle}
+          </h4>
+        </div>
+        <button 
+          onClick={handleDismiss}
+          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
+
+      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+        {descText}
+      </p>
+
+      <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 p-2 rounded-xl text-[10px] font-mono tracking-wider font-bold">
+        <span className="text-slate-400 dark:text-slate-500 text-[8px] uppercase font-sans">Ref ID:</span>
+        <div className="flex items-center gap-1.5 cursor-pointer relative" onClick={copyRefId}>
+          <span className="text-indigo-650 dark:text-indigo-400">{recentId}</span>
+          <span className="text-[10px] opacity-60">📋</span>
+          {copied && (
+            <span className="absolute -top-7 right-0 bg-emerald-600 text-white font-extrabold px-1.5 py-0.5 rounded text-[8px] whitespace-nowrap animate-fade-in">
+              ✓ Copied
+            </span>
           )}
         </div>
       </div>
 
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider group-hover:translate-x-2 transition-transform flex items-center gap-1">
-          {lang === 'si' ? 'මෙම Template එකෙන් හදන්න' : 'Use Template'} ➔
-        </span>
-      </div>
+      <a
+        href={`/checkout?id=${recentId}`}
+        className="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-650 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-md hover:shadow-lg transition-all text-center jelly-btn"
+      >
+        {t.recoveryAction}
+      </a>
     </div>
   );
 }
@@ -440,13 +538,29 @@ export default function LandingPage() {
 
   const t = TRANSLATIONS[lang];
 
+  const getHighlightedHeading = () => {
+    if (lang === 'si') {
+      return {
+        __html: t.heroHeading
+          .replace("ලංකාවේ රැකියාවලට", '<span class="bg-gradient-to-r from-indigo-650 via-indigo-500 to-purple-500 dark:from-indigo-400 dark:via-indigo-300 dark:to-indigo-200 bg-clip-text text-transparent">ලංකාවේ රැකියාවලට</span>')
+          .replace("වෘත්තීය CV එකක්", '<span class="bg-gradient-to-r from-emerald-600 via-emerald-550 to-indigo-500 dark:from-emerald-400 dark:via-emerald-350 dark:to-indigo-300 bg-clip-text text-transparent font-black">වෘත්තීය CV එකක්</span>')
+      };
+    } else {
+      return {
+        __html: t.heroHeading
+          .replace("Professional CV", '<span class="bg-gradient-to-r from-indigo-650 via-indigo-550 to-purple-650 dark:from-indigo-400 dark:via-indigo-300 dark:to-indigo-200 bg-clip-text text-transparent">Professional CV</span>')
+          .replace("Sri Lankan Jobs", '<span class="bg-gradient-to-r from-emerald-600 via-emerald-550 to-indigo-500 dark:from-emerald-400 dark:via-emerald-350 dark:to-indigo-300 bg-clip-text text-transparent font-black">Sri Lankan Jobs</span>')
+      };
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 selection:bg-indigo-500/35 relative overflow-hidden bg-grid-pattern">
       
       {/* Background Glowing Blobs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-10 left-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-rotate-slow"></div>
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full blur-3xl pointer-events-none animate-rotate-slow-reverse"></div>
+      <div className="absolute -bottom-10 left-10 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none animate-rotate-slow"></div>
 
       {/* Floating Glass Navbar */}
       <div className="sticky top-4 z-50 px-4 w-full max-w-6xl mx-auto animate-fade-in-up">
@@ -505,9 +619,10 @@ export default function LandingPage() {
             <AnimatedPricingBadge t={t} />
 
             {/* Title */}
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight uppercase max-w-3xl">
-              {t.heroHeading}
-            </h1>
+            <h1 
+              className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-tight uppercase max-w-3xl"
+              dangerouslySetInnerHTML={getHighlightedHeading()}
+            />
 
             {/* Subtitle */}
             <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
@@ -548,7 +663,7 @@ export default function LandingPage() {
           <span className="text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full">
             {lang === 'si' ? 'CV ආකෘති' : 'LankaCV Layouts'}
           </span>
-          <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
             {lang === 'si' ? 'ඔබට කැමති Template එකකින් ආරම්භ කරන්න' : 'Start with a Template Built for Success'}
           </h2>
           <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
@@ -592,7 +707,7 @@ export default function LandingPage() {
       {/* Steps / How It Works Section */}
       <section className="py-20 px-6 bg-white/40 dark:bg-slate-900/30 border-y border-slate-200 dark:border-slate-800/80 transition-colors duration-300 relative z-10">
         <div className="max-w-5xl mx-auto space-y-12">
-          <h2 className="text-xl md:text-3xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
+          <h2 className="text-2xl md:text-4xl font-black text-center uppercase tracking-wider text-slate-800 dark:text-white">
             {t.howItWorks}
           </h2>
           
@@ -663,6 +778,9 @@ export default function LandingPage() {
         <p>© {new Date().getFullYear()} {t.title} (Pvt) Ltd. All Rights Reserved. WhatsApp Support: +94 78 923 2752</p>
         <p className="opacity-75">Designed and built specifically for the Sri Lankan job vacancy market.</p>
       </footer>
+
+      {/* Draft Recovery Toast */}
+      <DraftRecoveryToast lang={lang} />
 
     </div>
   );

@@ -247,4 +247,25 @@ body {
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 
+/* Custom Mesh Blob Animations */
+@keyframes rotate-slow {
+  0% { transform: translate(0, 0) scale(1); rotate: 0deg; }
+  50% { transform: translate(40px, -60px) scale(1.15); rotate: 180deg; }
+  100% { transform: translate(0, 0) scale(1); rotate: 360deg; }
+}
+
+@keyframes rotate-slow-reverse {
+  0% { transform: translate(0, 0) scale(1.1); rotate: 0deg; }
+  50% { transform: translate(-50px, 40px) scale(0.9); rotate: -180deg; }
+  100% { transform: translate(0, 0) scale(1.1); rotate: -360deg; }
+}
+
+@utility animate-rotate-slow {
+  animation: rotate-slow 20s infinite alternate ease-in-out;
+}
+
+@utility animate-rotate-slow-reverse {
+  animation: rotate-slow-reverse 25s infinite alternate ease-in-out;
+}
+
 

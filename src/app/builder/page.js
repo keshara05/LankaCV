@@ -18,6 +18,92 @@ const THEME_COLORS = [
   { name: 'Rose', hex: '#be123c' }
 ];
 
+function DraftRecoveryToast({ lang }) {
+  const [visible, setVisible] = useState(false);
+  const [recentId, setRecentId] = useState('');
+  const [recentName, setRecentName] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedId = localStorage.getItem('recentCvId');
+      const storedName = localStorage.getItem('recentCvName');
+      const dismissed = localStorage.getItem('recentCvDismissed') === 'true';
+      
+      if (storedId && !dismissed) {
+        setRecentId(storedId);
+        setRecentName(storedName || 'Guest');
+        setVisible(true);
+      }
+    }
+  }, []);
+
+  const handleDismiss = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('recentCvDismissed', 'true');
+    }
+    setVisible(false);
+  };
+
+  const copyRefId = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(recentId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!visible) return null;
+
+  const t = TRANSLATIONS[lang || 'en'];
+  const descText = t.recoveryDesc.replace('{name}', recentName);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-white/80 dark:bg-slate-900/85 backdrop-blur-xl border border-indigo-500/30 dark:border-indigo-500/20 rounded-2xl shadow-2xl p-4.5 animate-fade-in-up flex flex-col gap-3">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+            {t.recoveryTitle}
+          </h4>
+        </div>
+        <button 
+          onClick={handleDismiss}
+          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
+
+      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+        {descText}
+      </p>
+
+      <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 p-2 rounded-xl text-[10px] font-mono tracking-wider font-bold">
+        <span className="text-slate-400 dark:text-slate-500 text-[8px] uppercase font-sans">Ref ID:</span>
+        <div className="flex items-center gap-1.5 cursor-pointer relative" onClick={copyRefId}>
+          <span className="text-indigo-650 dark:text-indigo-400">{recentId}</span>
+          <span className="text-[10px] opacity-60">📋</span>
+          {copied && (
+            <span className="absolute -top-7 right-0 bg-emerald-600 text-white font-extrabold px-1.5 py-0.5 rounded text-[8px] whitespace-nowrap animate-fade-in">
+              ✓ Copied
+            </span>
+          )}
+        </div>
+      </div>
+
+      <a
+        href={`/checkout?id=${recentId}`}
+        className="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-650 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-md hover:shadow-lg transition-all text-center jelly-btn"
+      >
+        {t.recoveryAction}
+      </a>
+    </div>
+  );
+}
+
 function BuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,6 +185,11 @@ function BuilderContent() {
       });
 
       if (response.ok) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('recentCvId', cvId);
+          localStorage.setItem('recentCvName', cvData.fullName || 'Guest');
+          localStorage.removeItem('recentCvDismissed');
+        }
         router.push(`/checkout?id=${cvId}`);
       } else {
         alert(t.saveError || 'Failed to save CV details.');
@@ -257,6 +348,9 @@ function BuilderContent() {
           <PreviewContainer cvData={{ ...cvData, language: lang }} />
         </div>
       </div>
+
+      {/* Draft Recovery Toast */}
+      <DraftRecoveryToast lang={lang} />
     </div>
   );
 }

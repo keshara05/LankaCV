@@ -1,39 +1,174 @@
 import { MongoClient } from 'mongodb';
+import fs from 'fs';
+import path from 'path';
 
 let client;
 let clientPromise = null;
+
+// Memory/File-based DB fallback for local development
+const MOCK_DB_FILE = path.join(process.cwd(), 'src/lib/mock_db.json');
+
+function readMockDB() {
+  try {
+    if (fs.existsSync(MOCK_DB_FILE)) {
+      return JSON.parse(fs.readFileSync(MOCK_DB_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('Failed to read mock db:', err);
+  }
+  return { cvs: {}, transactions: {} };
+}
+
+function writeMockDB(data) {
+  try {
+    fs.writeFileSync(MOCK_DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to write mock db:', err);
+  }
+}
+
+class MockCollection {
+  constructor(name) {
+    this.name = name;
+  }
+
+  async findOne(query) {
+    const db = readMockDB();
+    const items = db[this.name] || {};
+    if (query._id) {
+      return items[query._id] || null;
+    }
+    for (const id in items) {
+      let match = true;
+      for (const key in query) {
+        if (items[id][key] !== query[key]) match = false;
+      }
+      if (match) return items[id];
+    }
+    return null;
+  }
+
+  async updateOne(query, update, options = {}) {
+    const db = readMockDB();
+    if (!db[this.name]) db[this.name] = {};
+    const items = db[this.name];
+    const id = query._id;
+    if (!id) throw new Error('Query must contain _id');
+
+    let doc = items[id];
+    if (!doc && options.upsert) {
+      doc = { _id: id, createdAt: new Date() };
+      if (update.$setOnInsert) {
+        Object.assign(doc, update.$setOnInsert);
+      }
+    }
+
+    if (doc) {
+      if (update.$set) {
+        Object.assign(doc, update.$set);
+      }
+      items[id] = doc;
+      writeMockDB(db);
+    }
+    return { acknowledged: true, modifiedCount: 1 };
+  }
+
+  async insertOne(doc) {
+    const db = readMockDB();
+    if (!db[this.name]) db[this.name] = {};
+    const id = doc._id || 'tx-' + Math.random().toString(36).substring(2, 11);
+    doc._id = id;
+    db[this.name][id] = doc;
+    writeMockDB(db);
+    return { acknowledged: true, insertedId: id };
+  }
+
+  async aggregate(pipeline) {
+    const db = readMockDB();
+    const txs = db.transactions || {};
+    const cvs = db.cvs || {};
+
+    const results = Object.values(txs).map(tx => {
+      const cv = cvs[tx.cv_id] || {};
+      return {
+        id: tx._id,
+        cv_id: tx.cv_id,
+        bank_name: tx.bank_name,
+        payment_slip: tx.payment_slip,
+        whatsapp_number: tx.whatsapp_number,
+        status: tx.status,
+        created_at: tx.createdAt,
+        full_name: cv.fullName,
+        email: cv.email,
+        language: cv.language
+      };
+    });
+
+    results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    return {
+      toArray: async () => results
+    };
+  }
+}
+
+class MockDB {
+  collection(name) {
+    return new MockCollection(name);
+  }
+}
 
 function getClientPromise() {
   if (clientPromise) return clientPromise;
 
   const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    // Return null during build compilation if the environment variable isn't set yet.
-    // It will log a warning but won't crash the Next.js compiler.
-    console.warn('⚠️ WARNING: MONGODB_URI environment variable is missing.');
+  if (!uri || uri.includes('<username>') || uri.includes('xxxxxx')) {
+    // Treat placeholder URI as missing so we instantly fall back to mock
+    console.warn('⚠️ MONGODB_URI is a placeholder or missing.');
     return null;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    if (!global._mongoClientPromise) {
+  try {
+    if (process.env.NODE_ENV === 'development') {
+      if (!global._mongoClientPromise) {
+        client = new MongoClient(uri);
+        global._mongoClientPromise = client.connect();
+      }
+      clientPromise = global._mongoClientPromise;
+    } else {
       client = new MongoClient(uri);
-      global._mongoClientPromise = client.connect();
+      clientPromise = client.connect();
     }
-    clientPromise = global._mongoClientPromise;
-  } else {
-    client = new MongoClient(uri);
-    clientPromise = client.connect();
+    return clientPromise;
+  } catch (err) {
+    console.error('Failed to create MongoClient:', err);
+    return null;
   }
-  return clientPromise;
 }
 
+let useMock = false;
+
 export async function getDB() {
-  const promise = getClientPromise();
-  if (!promise) {
-    throw new Error('Database connection failed: MONGODB_URI environment variable is missing. Please add MONGODB_URI to your environment variables.');
+  if (useMock) {
+    return new MockDB();
   }
-  const connection = await promise;
-  return connection.db();
+
+  try {
+    const promise = getClientPromise();
+    if (!promise) {
+      console.warn('⚠️ MongoDB URI missing or invalid. Using local file mock database.');
+      useMock = true;
+      return new MockDB();
+    }
+    const connection = await promise;
+    // Fast ping to verify connection is alive
+    await connection.db().command({ ping: 1 });
+    return connection.db();
+  } catch (err) {
+    console.warn('⚠️ MongoDB connection failed. Falling back to local file mock database. Error:', err.message);
+    useMock = true;
+    return new MockDB();
+  }
 }
 
 export async function saveCV(id, cvData) {

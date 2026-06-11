@@ -38,6 +38,10 @@ function CheckoutForm() {
         .then(data => {
           if (!data.error) {
             setCvData(data);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('recentCvId', cvId);
+              localStorage.setItem('recentCvName', data.fullName || 'Guest');
+            }
           } else {
             setErrorMsg('Invalid CV reference. Please construct your CV first.');
           }

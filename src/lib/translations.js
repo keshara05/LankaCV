@@ -109,6 +109,12 @@ export const TRANSLATIONS = {
     refPhone: "Contact Number",
     refEmail: "Email Address",
 
+    // Recovery Widget
+    recoveryTitle: "Draft Recovered",
+    recoveryDesc: "We found your recent CV draft for {name}.",
+    recoveryAction: "Resume Payment ➔",
+    recoveryDismiss: "Dismiss",
+
     // Checkout Page
     checkoutTitle: "Manual Bank Transfer",
     checkoutSub: "Please transfer the fee of LKR 500 to our official Bank of Ceylon account.",
@@ -266,6 +272,12 @@ export const TRANSLATIONS = {
     refCompany: "ආයතනය / විශ්වවිද්‍යාලය",
     refPhone: "දුරකථන අංකය",
     refEmail: "ඊමේල් ලිපිනය",
+
+    // Recovery Widget
+    recoveryTitle: "නොගෙවූ CV එකක් හමු විය",
+    recoveryDesc: "{name} සඳහා ඔබ මෑතකදී සාදන ලද CV පත්‍රිකාව සොයා ගන්නා ලදී.",
+    recoveryAction: "ගෙවීම් පිටුවට යන්න ➔",
+    recoveryDismiss: "ඉවත් කරන්න",
 
     // Checkout Page
     checkoutTitle: "බැංකු තැන්පතු තොරතුරු",
